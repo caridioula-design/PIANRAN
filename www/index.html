@@ -191,6 +191,16 @@ dialog.lock::backdrop{background:var(--yellow)}
 [aria-checked="true"] .switch::after{transform:translateX(20px);background:var(--yellow)}
 .dzone{margin-top:22px;padding-top:14px;border-top:1px dashed var(--border)}
 .btn.danger.solid{background:var(--danger);color:#fff;border-color:var(--danger)}
+.banner{display:flex;gap:12px;align-items:flex-start;background:var(--white);border:1.5px solid var(--black);border-radius:14px;padding:12px 14px;margin-top:12px}
+.banner.arch{background:#EDEDE7;border-color:#8A8A80}
+.banner.ready{background:var(--yellow-soft);border-color:var(--yellow-line)}
+.banner .icon{margin-top:2px}
+.banner b{display:block}
+.banner small{display:block;color:var(--text-2);font-size:13px;margin-bottom:8px}
+.banner .btn{width:100%;flex:none}
+.archived .check{cursor:default}
+.archived .check:active{background:none}
+.archived ul{opacity:.85}
 @media (prefers-reduced-motion: reduce){*{transition-duration:1ms!important}}
 </style>
 </head>
@@ -218,6 +228,8 @@ dialog.lock::backdrop{background:var(--yellow)}
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
   <symbol id="i-finger" viewBox="0 0 24 24"><path d="M12 11v3a8 8 0 0 1-1.5 4.7"/><path d="M8.5 7.5A5 5 0 0 1 17 11v2a12 12 0 0 1-.8 4.3"/><path d="M5.5 10A7 7 0 0 1 12 4a7 7 0 0 1 7 7v1"/><path d="M8 11v2.5a5 5 0 0 1-1.4 3.5"/><path d="M14 14a10 10 0 0 1-2.2 6.2"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M21 5H9l-7 7 7 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m17 9-6 6M11 9l6 6"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/></symbol>
+  <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.2"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 </svg>
 
@@ -352,6 +364,7 @@ dialog.lock::backdrop{background:var(--yellow)}
     <button type="button" id="mLock"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Sécurité et garde-fous</button>
     <button type="button" id="mReport"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>Rapport annuel</button>
     <button type="button" id="mCopy"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Reconduire le mois précédent</button>
+    <button type="button" id="mArchive"><svg class="icon" aria-hidden="true"><use href="#i-archive"/></svg><span id="mArchiveL">Archiver ce mois</span></button>
     <button type="button" id="mUncheck"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>Tout décocher ce mois-ci</button>
     <button type="button" id="mExport"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Sauvegarder mes données</button>
     <button type="button" id="mImport"><svg class="icon" aria-hidden="true"><use href="#i-up"/></svg>Restaurer une sauvegarde</button>
@@ -583,7 +596,7 @@ function render(){
   $('#vTotal').textContent = money(total);
   $('#vReste').textContent = showReste(reste);
   $('#vReste').classList.toggle('neg', reste < 0 && !hideIncome);
-  $('#pCount').textContent = `${done.length} / ${items.length} payé${done.length > 1 ? 's' : ''} · ${money(paid)}`;
+  $('#pCount').textContent = (S.m && S.m.archived ? 'Archivé · ' : '') + `${done.length} / ${items.length} payé${done.length > 1 ? 's' : ''} · ${money(paid)}`;
   $('#pLeft').textContent = 'À payer : ' + money(total - paid);
   $('#pBar').style.transform = `scaleX(${total ? paid / total : 0})`;
 
@@ -607,28 +620,61 @@ function render(){
   const orphans = items.filter(i => !gById(i.groupId));
   const sections = S.groups.map(g => ({g, list: items.filter(i => i.groupId === g.id)}));
   if (orphans.length) sections.push({g: {id: '', name: 'Sans catégorie', color: '#9E9E9E'}, list: orphans});
-  $('#list').innerHTML = sections.map(({g, list}) => {
+  const arch = !!S.m.archived;
+  const unpaid = items.filter(i => !i.paid);
+  let top = '';
+  if (arch) top = `<div class="banner arch" role="status">${icon('i-archive')}<div style="flex:1;min-width:0"><b>Mois archivé${S.m.archivedAt ? ' le ' + dayLabel(S.m.archivedAt) : ''}</b>
+      <small>Lecture seule : les cases, dépenses et revenus ne peuvent plus être modifiés.</small>
+      <button class="btn" id="reopenBtn">${icon('i-unlock')}Rouvrir le mois</button></div></div>`;
+  else if (items.length && !unpaid.length) top = `<div class="banner ready" role="status">${icon('i-check')}<div style="flex:1;min-width:0"><b>Toutes les dépenses sont payées</b>
+      <small>Archivez le mois pour le verrouiller et éviter toute modification par erreur.</small>
+      <button class="btn primary" id="archiveTop">${icon('i-archive')}Archiver ${label(S.month)}</button></div></div>`;
+  $('#list').className = arch ? 'archived' : '';
+  $('#list').innerHTML = top + sections.map(({g, list}) => {
     const sub = list.reduce((s, i) => s + i.amount, 0);
     return `<section class="group" style="--c:${g.color}" aria-label="${esc(g.name)}">
       <div class="ghead">
-        ${g.id ? `<button class="gtitle" data-gedit="${g.id}" aria-label="Modifier la catégorie ${esc(g.name)}"><span class="dot" aria-hidden="true"></span>${esc(g.name)} <span class="num">${fmt(sub)}</span>${icon('i-edit')}</button>`
+        ${g.id && !arch ? `<button class="gtitle" data-gedit="${g.id}" aria-label="Modifier la catégorie ${esc(g.name)}"><span class="dot" aria-hidden="true"></span>${esc(g.name)} <span class="num">${fmt(sub)}</span>${icon('i-edit')}</button>`
                : `<div class="gtitle"><span class="dot" aria-hidden="true"></span>${esc(g.name)} <span class="num">${fmt(sub)}</span></div>`}
-        <button class="gadd" data-add="${g.id}" aria-label="Ajouter une dépense dans ${esc(g.name)}">${icon('i-plus')}Dépense</button>
+        ${arch ? '' : `<button class="gadd" data-add="${g.id}" aria-label="Ajouter une dépense dans ${esc(g.name)}">${icon('i-plus')}Dépense</button>`}
       </div>
       <ul>${list.length ? list.map(i => { const a = aById(i.accountId); return `<li class="${i.paid ? 'done' : ''}">
-        <button class="check" role="checkbox" aria-checked="${!!i.paid}" data-id="${i.id}">
+        <button class="check" role="checkbox" aria-checked="${!!i.paid}" ${arch ? 'aria-disabled="true" data-locked="1"' : `data-id="${i.id}"`}>
           <span class="box" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
           <span class="name"><span class="nm">${esc(i.name)}</span>${a ? `<br><span class="tag">${icon('i-arrow')}compte ${esc(a.name)}</span>` : ''}</span>
           <span class="amt num">${fmt(i.amount)}</span></button>
-        <button class="edit" data-edit="${i.id}" aria-label="Modifier ou supprimer ${esc(i.name)}">${icon('i-edit')}</button></li>`; }).join('')
+        ${arch ? '' : `<button class="edit" data-edit="${i.id}" aria-label="Modifier ou supprimer ${esc(i.name)}">${icon('i-edit')}</button>`}</li>`; }).join('')
         : `<li><span class="gempty">Aucune dépense dans cette catégorie.</span></li>`}</ul></section>`;
-  }).join('') + `<button class="bigbtn dash" id="newGroup">${icon('i-folder')}Nouvelle catégorie</button>`;
-  $('#newGroup').onclick = () => openGroup();
+  }).join('') + (arch ? '' : `<button class="bigbtn dash" id="newGroup">${icon('i-folder')}Nouvelle catégorie</button>
+    <button class="bigbtn white" id="archiveBottom">${icon('i-archive')}Archiver ${label(S.month)}</button>`);
+  $('#newGroup')?.addEventListener('click', () => openGroup());
+  $('#archiveTop')?.addEventListener('click', archiveMonth);
+  $('#archiveBottom')?.addEventListener('click', archiveMonth);
+  $('#reopenBtn')?.addEventListener('click', reopenMonth);
 }
+
+/* =============== Archivage =============== */
+async function archiveMonth(){
+  if (!S.m || S.m.archived) return;
+  const unpaid = S.m.items.filter(i => !i.paid), rest = unpaid.reduce((s, i) => s + i.amount, 0);
+  const text = unpaid.length
+    ? `Attention : ${unpaid.length} ligne(s) ne sont pas cochées (${money(rest)}). Elles resteront « non payées ». Le mois passera en lecture seule ; vous pourrez le rouvrir.`
+    : `Toutes les dépenses sont payées. Le mois passera en lecture seule ; vous pourrez le rouvrir.`;
+  if (!await confirmDlg(`Archiver ${label(S.month)} ?`, text, 'Archiver')) return;
+  S.m.archived = true; S.m.archivedAt = today(); await saveMonth(); render();
+  toast(`${label(S.month)} archivé`, async () => { S.m.archived = false; delete S.m.archivedAt; await saveMonth(); render(); });
+}
+async function reopenMonth(){
+  if (!S.m || !S.m.archived) return;
+  if (!await confirmDlg(`Rouvrir ${label(S.month)} ?`, 'Le mois redevient modifiable (cases, dépenses, revenus). Pensez à l\u2019archiver de nouveau une fois terminé.', 'Rouvrir')) return;
+  S.m.archived = false; delete S.m.archivedAt; await saveMonth(); render(); toast(`${label(S.month)} rouvert`);
+}
+const isArchived = () => !!(S.m && S.m.archived);
+const archivedMsg = () => toast('Mois archivé : rouvrez-le pour le modifier');
 
 /* =============== Mois =============== */
 async function copyFrom(prev){
-  S.m = {month: S.month, incomes: prev.incomes.map(i => ({...i, id: uid()})), items: prev.items.map(i => ({...i, id: uid(), paid: false}))};
+  S.m = {month: S.month, incomes: prev.incomes.map(i => ({...i, id: uid()})), items: prev.items.map(i => ({...i, id: uid(), paid: false}))};  // nouveau mois : jamais archivé
   await saveMonth(); render(); toast(`${label(prev.month)} reconduit`);
 }
 const goMonth = k => { S.month = shift(S.month, k); S.m = S.months.find(m => m.month === S.month) || null; render(); };
@@ -640,6 +686,7 @@ let confirmCheck = (() => { try { return localStorage.getItem('confirmCheck') !=
 document.querySelector('main').addEventListener('click', async e => {
   const c = e.target.closest('[data-id]'), ed = e.target.closest('[data-edit]'), add = e.target.closest('[data-add]'),
         ge = e.target.closest('[data-gedit]'), ac = e.target.closest('[data-acct]');
+  if (e.target.closest('[data-locked]')) return archivedMsg();
   if (c){
     const it = S.m.items.find(i => i.id === c.dataset.id);
     if (Date.now() - lastTap < 600) return;          // anti double-tap
@@ -762,6 +809,7 @@ $('#incList').addEventListener('click', async e => {
 });
 $('#incAdd').onclick = () => { const n = {id: uid(), name: '', amount: 0}; incDraft.push(n); incRender(); document.getElementById('in-' + n.id).focus(); };
 $('#budgetBtn').onclick = () => {
+  if (isArchived()) return archivedMsg();
   if (!S.m) return toast('Commencez d’abord la liste du mois');
   incDraft = S.m.incomes.map(i => ({...i})); incRender(); $('#incDlg').showModal();
 };
@@ -888,9 +936,16 @@ function toast(msg, undo){
 }
 
 /* =============== Menu =============== */
-$('#menuBtn').onclick = () => $('#menuDlg').showModal();
+$('#menuBtn').onclick = () => {
+  $('#mArchive').hidden = !S.m;
+  $('#mArchiveL').textContent = isArchived() ? `Rouvrir ${label(S.month)}` : `Archiver ${label(S.month)}`;
+  $('#mArchive').querySelector('use').setAttribute('href', isArchived() ? '#i-unlock' : '#i-archive');
+  $('#menuDlg').showModal();
+};
+$('#mArchive').onclick = () => { $('#menuDlg').close(); isArchived() ? reopenMonth() : archiveMonth(); };
 $('#mCopy').onclick = async () => {
   $('#menuDlg').close();
+  if (isArchived()) return archivedMsg();
   const prev = previousFilled();
   if (!prev) return toast('Aucun mois précédent à reprendre');
   if (S.m && S.m.items.length && !await confirmDlg('Reconduire ?', `La liste de ${label(S.month)} sera remplacée par celle de ${label(prev.month)}, cases décochées.`, 'Reconduire')) return;
@@ -898,7 +953,7 @@ $('#mCopy').onclick = async () => {
   if (before) toast(`${label(prev.month)} reconduit`, async () => { S.m = before; await saveMonth(); render(); });
 };
 $('#mUncheck').onclick = async () => {
-  $('#menuDlg').close(); if (!S.m) return;
+  $('#menuDlg').close(); if (!S.m) return; if (isArchived()) return archivedMsg();
   const n = S.m.items.filter(i => i.paid).length; if (!n) return toast('Aucune case cochée');
   if (!await confirmDlg('Tout décocher ?', `${n} ligne(s) payée(s) de ${label(S.month)} repasseront en « non payé ». Les versements sur les comptes seront retirés.`, 'Tout décocher', {danger: true})) return;
   const before = S.m.items.map(i => i.paid); S.m.items.forEach(i => i.paid = false); await saveMonth(); render();
@@ -952,7 +1007,7 @@ let repYear = Number(S.month.slice(0, 4)), repData = null;
 function buildReport(year){
   const months = S.months.filter(m => m.month.startsWith(year + '-')).sort((a,b) => a.month.localeCompare(b.month));
   const gname = id => (gById(id) || {name: 'Sans catégorie'}).name;
-  const rows = months.map(m => { const r = revenue(m), p = planned(m), pay = m.items.filter(i => i.paid).reduce((s, i) => s + i.amount, 0); return {month: m.month, rev: r, plan: p, paid: pay, reste: r - p}; });
+  const rows = months.map(m => { const r = revenue(m), p = planned(m), pay = m.items.filter(i => i.paid).reduce((s, i) => s + i.amount, 0); return {month: m.month, rev: r, plan: p, paid: pay, reste: r - p, arch: !!m.archived}; });
   const sum = k => rows.reduce((s, r) => s + r[k], 0);
   const cats = {}, srcs = {};
   months.forEach(m => {
@@ -984,7 +1039,7 @@ function showReport(){
       </div>
       <h3>Mois par mois</h3>
       <div class="tscroll"><table class="tbl"><thead><tr><th scope="col">Mois</th><th scope="col">Revenus</th><th scope="col">Prévu</th><th scope="col">Payé</th><th scope="col">Reste</th></tr></thead><tbody>
-        ${d.rows.map(r => `<tr><td class="cap">${shortMonth(r.month)}</td><td>${fmt(r.rev)}</td><td>${fmt(r.plan)}</td><td>${fmt(r.paid)}</td><td class="${r.reste < 0 ? 'neg' : ''}">${sg(r.reste)}</td></tr>`).join('')}
+        ${d.rows.map(r => `<tr><td class="cap">${shortMonth(r.month)}${r.arch ? '<br><small style="color:var(--text-2);text-transform:none">archivé</small>' : ''}</td><td>${fmt(r.rev)}</td><td>${fmt(r.plan)}</td><td>${fmt(r.paid)}</td><td class="${r.reste < 0 ? 'neg' : ''}">${sg(r.reste)}</td></tr>`).join('')}
         <tr class="tot"><td>Total</td><td>${fmt(d.tot.rev)}</td><td>${fmt(d.tot.plan)}</td><td>${fmt(d.tot.paid)}</td><td>${sg(d.tot.reste)}</td></tr></tbody></table></div>
       ${d.accts.length ? `<h3>Comptes</h3>
       <div class="tscroll"><table class="tbl"><thead><tr><th scope="col">Compte</th><th scope="col">Début</th><th scope="col">Entrées</th><th scope="col">Sorties</th><th scope="col">Fin</th></tr></thead><tbody>
@@ -1018,7 +1073,7 @@ function reportPDF(d){
   doc.autoTable({...base, startY: 38, styles: {fontSize: 11, cellPadding: 3}, head: [['Synthèse ' + d.year, 'Montant']],
     body: [['Revenus de l’année', n(d.tot.rev)], ['Dépenses prévues', n(d.tot.plan)], ['Dépenses payées', n(d.tot.paid)], ['Reste cumulé (revenus - prévu)', sg(d.tot.reste)], ['Mois suivis', String(d.rows.length)]]});
   doc.autoTable({...base, startY: next(), head: [['Mois', 'Revenus', 'Prévu', 'Payé', 'Reste']],
-    body: d.rows.map(r => [shortMonth(r.month).replace(/^./, c => c.toUpperCase()), n(r.rev), n(r.plan), n(r.paid), sg(r.reste)]),
+    body: d.rows.map(r => [shortMonth(r.month).replace(/^./, c => c.toUpperCase()) + (r.arch ? ' (archivé)' : ''), n(r.rev), n(r.plan), n(r.paid), sg(r.reste)]),
     foot: [['Total', n(d.tot.rev), n(d.tot.plan), n(d.tot.paid), sg(d.tot.reste)]]});
   if (d.accts.length) doc.autoTable({...base, startY: next(), head: [['Compte', 'Solde début', 'Entrées', 'Sorties', 'Solde fin']],
     body: d.accts.map(a => [a.name, sg(a.open), n(a.in), n(a.out), sg(a.close)])});

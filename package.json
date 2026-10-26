@@ -1,6 +1,6 @@
 {
   "name": "pianran-budget",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "private": true,
   "description": "PIANRAN Budget - suivi de budget hors-ligne (IndexedDB)",
   "scripts": {
