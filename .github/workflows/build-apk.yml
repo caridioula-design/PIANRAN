@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   apk:
     runs-on: ubuntu-24.04
@@ -38,3 +40,13 @@ jobs:
         with:
           name: PIANRAN-Budget-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Déposer l'APK sur la branche apk
+        run: |
+          mkdir out && cp android/app/build/outputs/apk/debug/app-debug.apk out/PIANRAN-Budget.apk
+          cd out
+          echo "Build ${GITHUB_SHA::7} du $(date -u +%Y-%m-%dT%H:%MZ)" > BUILD.txt
+          git init -q -b apk
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add . && git commit -qm "APK ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" apk
