@@ -159,6 +159,36 @@ button.hrow:active{background:#F2F2EC}
 .toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));margin:0 auto;max-width:440px;background:var(--black);color:var(--white);padding:12px 16px;border-radius:14px;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity 160ms,transform 200ms;z-index:2000}
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .toast button{border:0;background:none;color:var(--yellow);font-weight:800;min-height:40px}
+/* Verrouillage */
+dialog.lock{margin:0;max-width:none;width:100%;height:100dvh;max-height:100dvh;border-radius:0;background:var(--yellow)}
+dialog.lock::backdrop{background:var(--yellow)}
+.lockin{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top) + 24px) 24px calc(24px + env(safe-area-inset-bottom));gap:10px;text-align:center}
+.lockin img{width:72px;height:72px;border-radius:18px}
+.lockin h2{margin:6px 0 0;font-size:22px}
+.lockin p{margin:0;font-weight:600;min-height:24px}
+.lockin p.err{color:var(--danger)}
+.dots{display:flex;gap:16px;margin:10px 0 14px}
+.dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--black);transition:background 120ms}
+.dots span.on{background:var(--black)}
+.dots.shake{animation:shake 320ms}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px 22px}
+.pad button{width:76px;height:76px;border-radius:50%;border:1.5px solid var(--black);background:var(--white);font-size:28px;font-weight:700;display:grid;place-items:center}
+.pad button:active{background:var(--yellow-soft)}
+.pad button.ghost{background:none;border-color:transparent}
+.pad button.ghost:active{background:rgba(0,0,0,.08)}
+.pad .icon{width:30px;height:30px}
+.lockin .linkbtn{margin-top:8px}
+.swrow{display:flex;align-items:center;gap:12px;min-height:60px;width:100%;border:0;background:none;text-align:left;padding:6px 4px;border-top:1px solid var(--border)}
+.swrow:first-of-type{border-top:0}
+.swrow[disabled]{opacity:.45}
+.swrow .t{flex:1;min-width:0}
+.swrow .t b{display:block}
+.swrow .t small{color:var(--text-2);font-size:13px}
+.switch{width:52px;height:32px;border-radius:999px;background:#C9C9C0;position:relative;flex:none;transition:background 150ms}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform 150ms}
+[aria-checked="true"] .switch{background:var(--black)}
+[aria-checked="true"] .switch::after{transform:translateX(20px);background:var(--yellow)}
 @media (prefers-reduced-motion: reduce){*{transition-duration:1ms!important}}
 </style>
 </head>
@@ -181,6 +211,11 @@ button.hrow:active{background:#F2F2EC}
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M8 17V11M13 17V7M18 17v-4"/></symbol>
   <symbol id="i-piggy" viewBox="0 0 24 24"><path d="M19 9c1.5 0 2 1 2 2.5S20 14 19 14l-1 3h-3v-2h-4v2H8l-1-3c-2-1-3-3-3-5 0-3 3-5 7-5 2 0 4 .5 5 1.5L19 5z"/><path d="M15 9h.01"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.5 0-10-7-10-7a18 18 0 0 1 5.1-5.9M9.9 5.2A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-finger" viewBox="0 0 24 24"><path d="M12 11v3a8 8 0 0 1-1.5 4.7"/><path d="M8.5 7.5A5 5 0 0 1 17 11v2a12 12 0 0 1-.8 4.3"/><path d="M5.5 10A7 7 0 0 1 12 4a7 7 0 0 1 7 7v1"/><path d="M8 11v2.5a5 5 0 0 1-1.4 3.5"/><path d="M14 14a10 10 0 0 1-2.2 6.2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M21 5H9l-7 7 7 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m17 9-6 6M11 9l6 6"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 </svg>
 
@@ -189,6 +224,7 @@ button.hrow:active{background:#F2F2EC}
     <button class="ibtn" id="prev" aria-label="Mois précédent"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
     <h1 class="month" id="month" aria-live="polite"></h1>
     <button class="ibtn" id="next" aria-label="Mois suivant"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
+    <button class="ibtn" id="eyeBtn" aria-pressed="false" aria-label="Masquer le salaire"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></button>
     <button class="ibtn" id="menuBtn" aria-label="Menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
   </div>
   <div class="sum">
@@ -323,6 +359,7 @@ button.hrow:active{background:#F2F2EC}
 <dialog id="menuDlg" aria-labelledby="menuTitle">
   <form method="dialog" class="menu">
     <h2 id="menuTitle">Menu</h2>
+    <button type="button" id="mLock"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Verrouillage (code PIN, empreinte)</button>
     <button type="button" id="mReport"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>Rapport annuel</button>
     <button type="button" id="mCopy"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Reconduire le mois précédent</button>
     <button type="button" id="mUncheck"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>Tout décocher ce mois-ci</button>
@@ -332,6 +369,37 @@ button.hrow:active{background:#F2F2EC}
     <div class="row"><button value="close" class="btn">Fermer</button></div>
     <p>Les données restent sur ce téléphone. Chaque mois a sa propre liste ; les comptes cumulent d'un mois à l'autre.</p>
   </form>
+</dialog>
+
+<!-- Réglages de verrouillage -->
+<dialog id="secDlg" aria-labelledby="secTitle">
+  <form method="dialog">
+    <h2 id="secTitle">Verrouillage</h2>
+    <button type="button" class="swrow" role="switch" id="swPin" aria-checked="false"><span class="t"><b>Code PIN</b><small>Demandé à l'ouverture et après 30 secondes hors de l'app</small></span><span class="switch" aria-hidden="true"></span></button>
+    <button type="button" class="swrow" role="switch" id="swBio" aria-checked="false"><span class="t"><b>Empreinte digitale</b><small id="bioHelp">Déverrouiller avec le doigt au lieu du code</small></span><span class="switch" aria-hidden="true"></span></button>
+    <button type="button" class="swrow" id="chPin"><span class="t"><b>Changer le code PIN</b></span><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
+    <div class="row"><button value="close" class="btn">Fermer</button></div>
+  </form>
+</dialog>
+
+<!-- Écran de verrouillage -->
+<dialog id="lock" class="lock" aria-labelledby="lockTitle" aria-describedby="lockMsg">
+  <div class="lockin">
+    <img src="icons/icon-192.png" alt="" width="72" height="72">
+    <h2 id="lockTitle">PIANRAN</h2>
+    <p id="lockMsg" aria-live="assertive">Entrez votre code PIN</p>
+    <div class="dots" id="dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="pad" id="pad">
+      <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+      <button type="button" class="ghost" id="padBio" aria-label="Déverrouiller avec l'empreinte"><svg class="icon" aria-hidden="true"><use href="#i-finger"/></svg></button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" class="ghost" id="padDel" aria-label="Effacer le dernier chiffre"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg></button>
+    </div>
+    <button type="button" class="linkbtn" id="lockCancel">Annuler</button>
+    <button type="button" class="linkbtn" id="lockForgot">Code oublié ?</button>
+  </div>
 </dialog>
 
 <!-- Confirmation -->
@@ -497,16 +565,32 @@ function accountMoves(accId, untilDate = '9999-12-31'){
 }
 const balance = (accId, until) => accountMoves(accId, until).reduce((s, x) => s + x.amount, 0);
 
+/* =============== Masquer le salaire =============== */
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+let hideIncome = lsGet('hideIncome') === '1';
+const MASK = '•••••• F';
+const showRev = n => hideIncome ? MASK : money(n);
+const showReste = n => hideIncome ? MASK : signed(n);
+function syncEye(){
+  const b = $('#eyeBtn');
+  b.setAttribute('aria-pressed', String(hideIncome));
+  b.setAttribute('aria-label', hideIncome ? 'Afficher le salaire' : 'Masquer le salaire');
+  b.innerHTML = icon(hideIncome ? 'i-eyeoff' : 'i-eye');
+}
+$('#eyeBtn').onclick = () => { hideIncome = !hideIncome; lsSet('hideIncome', hideIncome ? '1' : '0'); syncEye(); render(); toast(hideIncome ? 'Salaire masqué' : 'Salaire affiché'); };
+syncEye();
+
 /* =============== Affichage principal =============== */
 function render(){
   $('#month').textContent = label(S.month);
   const items = S.m ? S.m.items : [];
   const total = planned(S.m), done = items.filter(i => i.paid), paid = done.reduce((s, i) => s + i.amount, 0);
   const rev = revenue(S.m), reste = rev - total;
-  $('#vBudget').textContent = money(rev);
+  $('#vBudget').textContent = showRev(rev);
   $('#vTotal').textContent = money(total);
-  $('#vReste').textContent = signed(reste);
-  $('#vReste').classList.toggle('neg', reste < 0);
+  $('#vReste').textContent = showReste(reste);
+  $('#vReste').classList.toggle('neg', reste < 0 && !hideIncome);
   $('#pCount').textContent = `${done.length} / ${items.length} payé${done.length > 1 ? 's' : ''} · ${money(paid)}`;
   $('#pLeft').textContent = 'À payer : ' + money(total - paid);
   $('#pBar').style.transform = `scaleX(${total ? paid / total : 0})`;
@@ -594,7 +678,7 @@ function openItem(it = null, groupId = ''){
 function itemPreview(){
   const total = planned(S.m) - (editing ? editing.amount : 0) + parse($('#iAmt').value);
   const reste = revenue(S.m) - total;
-  $('#iPrev').innerHTML = `<span>Revenus</span><b class="num">${money(revenue(S.m))}</b><span>Nouveau total</span><b class="num">${money(total)}</b><span>Reste</span><b class="num ${reste < 0 ? 'neg' : ''}">${signed(reste)}</b>`;
+  $('#iPrev').innerHTML = `<span>Revenus</span><b class="num">${showRev(revenue(S.m))}</b><span>Nouveau total</span><b class="num">${money(total)}</b><span>Reste</span><b class="num ${reste < 0 && !hideIncome ? 'neg' : ''}">${showReste(reste)}</b>`;
 }
 $('#iAmt').addEventListener('input', e => { fmtInput(e.target); itemPreview(); });
 $('#itemForm').addEventListener('submit', async e => {
@@ -932,11 +1016,137 @@ async function sendReport(mode){
 $('#repSave').onclick = () => sendReport('save');
 $('#repMail').onclick = () => sendReport('mail');
 
+/* =============== Verrouillage (code PIN + empreinte) =============== */
+let L = {enabled: false, salt: '', hash: '', bio: false};
+let bioAvailable = false, locked = false, lockMode = null, lockResolve = null, entry = '', firstPin = '', fails = 0, waitUntil = 0, suspendLock = false, hiddenAt = 0;
+const PIN_LEN = 4;
+async function sha(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+const saveLock = () => put('meta', {key: 'lock', ...L});
+async function checkBio(){
+  bioAvailable = false;
+  if (!isNative()) return;
+  try { const r = await native('NativeBiometric', 'isAvailable', {useFallback: false}); bioAvailable = !!(r && r.isAvailable); } catch {}
+}
+function setMsg(t, err = false){ const m = $('#lockMsg'); m.textContent = t; m.classList.toggle('err', err); }
+function drawDots(){ document.querySelectorAll('#dots span').forEach((d, i) => d.classList.toggle('on', i < entry.length)); }
+function shake(){ const d = $('#dots'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); if (navigator.vibrate) navigator.vibrate([40, 40, 40]); }
+function openLock(mode){
+  lockMode = mode; entry = ''; firstPin = ''; drawDots();
+  setMsg(mode === 'setup' ? `Choisissez un code PIN (${PIN_LEN} chiffres)` : 'Entrez votre code PIN');
+  $('#padBio').style.visibility = (mode === 'unlock' && L.bio && bioAvailable) ? 'visible' : 'hidden';
+  $('#lockCancel').hidden = mode === 'unlock';
+  $('#lockForgot').hidden = mode === 'setup';
+  document.querySelectorAll('dialog[open]').forEach(d => { if (d.id !== 'lock') d.close(); });
+  if (!$('#lock').open) $('#lock').showModal();
+}
+function closeLock(result){
+  $('#lock').close(); const r = lockResolve; lockResolve = null; lockMode = null;
+  if (r) r(result);
+}
+const askPin = mode => new Promise(res => { lockResolve = res; openLock(mode); });
+async function lockNow(){
+  if (!L.enabled || locked) return;
+  locked = true; openLock('unlock');
+  if (L.bio && bioAvailable) setTimeout(tryBio, 350);
+}
+function unlock(){ locked = false; fails = 0; closeLock(true); }
+async function tryBio(){
+  if (!bioAvailable || !L.bio) return;
+  suspendLock = true;
+  try {
+    await native('NativeBiometric', 'verifyIdentity', {reason: 'Déverrouiller PIANRAN', title: 'Déverrouiller PIANRAN', subtitle: 'Posez votre doigt sur le capteur', negativeButtonText: 'Utiliser le code PIN', maxAttempts: 5});
+    if (lockMode === 'unlock') unlock();
+  } catch { setMsg('Entrez votre code PIN'); }
+  finally { setTimeout(() => suspendLock = false, 800); }
+}
+async function onDigit(k){
+  if (Date.now() < waitUntil){ setMsg(`Trop d'essais. Réessayez dans ${Math.ceil((waitUntil - Date.now()) / 1000)} s`, true); return; }
+  if (entry.length >= PIN_LEN) return;
+  entry += k; drawDots();
+  if (entry.length < PIN_LEN) return;
+  const pin = entry;
+  await new Promise(r => setTimeout(r, 120));
+  if (lockMode === 'setup'){
+    if (!firstPin){ firstPin = pin; entry = ''; drawDots(); setMsg('Confirmez le code PIN'); return; }
+    if (pin !== firstPin){ shake(); firstPin = ''; entry = ''; drawDots(); setMsg('Les codes ne correspondent pas. Recommencez.', true); return; }
+    const salt = uid(); L.salt = salt; L.hash = await sha(salt + pin); L.enabled = true; await saveLock();
+    return closeLock(true);
+  }
+  if (await sha(L.salt + pin) === L.hash){ fails = 0; if (lockMode === 'unlock') return unlock(); return closeLock(true); }
+  fails++; shake(); entry = ''; drawDots();
+  if (fails >= 5){ waitUntil = Date.now() + 30000; fails = 0; setMsg('Trop d’essais. Patientez 30 secondes.', true); }
+  else setMsg(`Code incorrect (${5 - fails} essai${5 - fails > 1 ? 's' : ''} restant${5 - fails > 1 ? 's' : ''})`, true);
+}
+$('#pad').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) onDigit(b.dataset.k); });
+$('#padDel').onclick = () => { entry = entry.slice(0, -1); drawDots(); };
+$('#padBio').onclick = tryBio;
+$('#lockCancel').onclick = () => closeLock(false);
+$('#lock').addEventListener('cancel', e => { e.preventDefault(); if (lockMode !== 'unlock') closeLock(false); });
+$('#lock').addEventListener('keydown', e => {
+  if (/^[0-9]$/.test(e.key)){ e.preventDefault(); onDigit(e.key); }
+  else if (e.key === 'Backspace'){ e.preventDefault(); entry = entry.slice(0, -1); drawDots(); }
+});
+$('#lockForgot').onclick = async () => {
+  const mode = lockMode;
+  $('#lock').close();
+  const ok = await confirmDlg('Code oublié ?', 'Sans le code, la seule solution est d’effacer toutes les données de l’application (lignes, revenus, comptes). Si vous avez une sauvegarde, vous pourrez la restaurer ensuite.', 'Tout effacer');
+  if (!ok){ $('#lock').showModal(); return; }
+  for (const s of ['groups','months','accounts','flows','meta']) await clear(s);
+  location.reload();
+  void mode;
+};
+document.addEventListener('visibilitychange', () => {
+  if (!L.enabled) return;
+  if (document.hidden){ hiddenAt = Date.now(); return; }
+  if (!suspendLock && !locked && Date.now() - hiddenAt > 30000) lockNow();
+});
+
+// Réglages
+function renderSec(){
+  $('#swPin').setAttribute('aria-checked', String(L.enabled));
+  $('#swBio').setAttribute('aria-checked', String(L.enabled && L.bio));
+  $('#swBio').disabled = !L.enabled || !bioAvailable;
+  $('#bioHelp').textContent = !bioAvailable ? 'Non disponible sur cet appareil (ou aucune empreinte enregistrée dans Android)' : (!L.enabled ? 'Activez d’abord le code PIN' : 'Déverrouiller avec le doigt au lieu du code');
+  $('#chPin').hidden = !L.enabled;
+}
+$('#mLock').onclick = async () => { $('#menuDlg').close(); await checkBio(); renderSec(); $('#secDlg').showModal(); };
+$('#swPin').onclick = async () => {
+  if (!L.enabled){
+    if (!crypto.subtle){ toast('Verrouillage indisponible ici'); return; }
+    if (await askPin('setup')) toast('Code PIN activé');
+  } else {
+    if (await askPin('verify')){ L = {enabled: false, salt: '', hash: '', bio: false}; await saveLock(); toast('Verrouillage désactivé'); }
+  }
+  renderSec(); $('#secDlg').showModal();
+};
+$('#swBio').onclick = async () => {
+  if (!L.bio){
+    suspendLock = true;
+    try {
+      await native('NativeBiometric', 'verifyIdentity', {reason: 'Activer l’empreinte', title: 'Activer l’empreinte', subtitle: 'Posez votre doigt pour confirmer', negativeButtonText: 'Annuler'});
+      L.bio = true; await saveLock(); toast('Empreinte activée');
+    } catch { toast('Empreinte non confirmée'); }
+    finally { setTimeout(() => suspendLock = false, 800); }
+  } else { L.bio = false; await saveLock(); toast('Empreinte désactivée'); }
+  renderSec();
+};
+$('#chPin').onclick = async () => {
+  if (!await askPin('verify')){ renderSec(); $('#secDlg').showModal(); return; }
+  const old = {...L};
+  if (await askPin('setup')) toast('Code PIN modifié'); else { L = old; await saveLock(); }
+  renderSec(); $('#secDlg').showModal();
+};
+
 /* =============== Démarrage =============== */
 (async () => {
   try {
     db = await openDB();
     navigator.storage?.persist?.().catch(() => {});
+    const saved = await get('meta', 'lock');
+    if (saved && saved.enabled && saved.hash){ L = {enabled: true, salt: saved.salt, hash: saved.hash, bio: !!saved.bio}; await checkBio(); lockNow(); }
     await setup(); await loadAll(); render();
   } catch (e) { console.error(e); document.body.insertAdjacentHTML('afterbegin', '<p style="padding:16px;color:#B42318">Stockage indisponible sur cet appareil.</p>'); }
 })();
