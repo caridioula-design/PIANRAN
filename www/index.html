@@ -142,8 +142,8 @@ dialog.full .wrap{display:flex;flex-direction:column;height:100%}
 .balance .k{font-weight:700;color:var(--text-2);font-size:14px}
 .balance .v{font-weight:850;font-size:32px;line-height:1.2;overflow-wrap:anywhere}
 .balance .s{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;margin-top:6px}
-.hist .t1{font-weight:600}
-.hist .t2{font-size:13px;color:var(--text-2)}
+.t1{font-weight:600}
+.t2{font-size:13px;color:var(--text-2)}
 .hrow{display:flex;align-items:center;gap:12px;padding:10px 12px;min-height:56px;width:100%;border:0;background:none;text-align:left}
 button.hrow:active{background:#F2F2EC}
 .tbl{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--border);font-size:13px}
@@ -357,6 +357,20 @@ dialog.lock::backdrop{background:var(--yellow)}
   </div>
 </dialog>
 
+<!-- Sauvegardes -->
+<dialog id="bkDlg" class="full" aria-labelledby="bkTitle">
+  <div class="wrap">
+    <div class="rhead">
+      <button class="ibtn" data-close aria-label="Retour"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
+      <h2 id="bkTitle">Sauvegardes</h2>
+      <span style="width:44px"></span>
+    </div>
+    <div class="rbody" id="bkBody"></div>
+    <div class="rfoot"><button class="btn primary" id="bkNow"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Sauvegarder maintenant</button></div>
+  </div>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+</dialog>
+
 <!-- Menu -->
 <dialog id="menuDlg" aria-labelledby="menuTitle">
   <form method="dialog" class="menu">
@@ -366,9 +380,7 @@ dialog.lock::backdrop{background:var(--yellow)}
     <button type="button" id="mCopy"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Reconduire le mois précédent</button>
     <button type="button" id="mArchive"><svg class="icon" aria-hidden="true"><use href="#i-archive"/></svg><span id="mArchiveL">Archiver ce mois</span></button>
     <button type="button" id="mUncheck"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>Tout décocher ce mois-ci</button>
-    <button type="button" id="mExport"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Sauvegarder mes données</button>
-    <button type="button" id="mImport"><svg class="icon" aria-hidden="true"><use href="#i-up"/></svg>Restaurer une sauvegarde</button>
-    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <button type="button" id="mBackup"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Sauvegardes</button>
     <div class="row"><button value="close" class="btn">Fermer</button></div>
     <p>Les données restent sur ce téléphone. Chaque mois a sa propre liste ; les comptes cumulent d'un mois à l'autre.</p>
   </form>
@@ -662,6 +674,7 @@ async function archiveMonth(){
     : `Toutes les dépenses sont payées. Le mois passera en lecture seule ; vous pourrez le rouvrir.`;
   if (!await confirmDlg(`Archiver ${label(S.month)} ?`, text, 'Archiver')) return;
   S.m.archived = true; S.m.archivedAt = today(); await saveMonth(); render();
+  if (isNative() && autoBackup) backupNow('archive', true).catch(() => {});
   toast(`${label(S.month)} archivé`, async () => { S.m.archived = false; delete S.m.archivedAt; await saveMonth(); render(); });
 }
 async function reopenMonth(){
@@ -967,7 +980,7 @@ const b64 = str => btoa(unescape(encodeURIComponent(str)));
 async function deliverFile({name, mime, base64, blob, mode, subject, text}){
   if (isNative()){
     if (mode === 'save'){
-      try { await native('Filesystem', 'writeFile', {path: name, data: base64, directory: 'DOCUMENTS', recursive: true}); toast('Enregistré dans Documents/' + name); return; }
+      try { await writeInApp(REP_DIR, name, base64); toast('Enregistré dans ' + (bkDirType === 'DOCUMENTS' ? 'Documents › PIANRAN › Rapports' : 'le dossier de l\u2019app')); return; }
       catch (e) { toast('Choisissez où enregistrer le fichier'); }
     }
     const f = await native('Filesystem', 'writeFile', {path: name, data: base64, directory: 'CACHE'});
@@ -980,26 +993,132 @@ async function deliverFile({name, mime, base64, blob, mode, subject, text}){
   if (mode === 'mail') setTimeout(() => location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text + '\n\nPièce jointe : ' + name + ' (téléchargé sur l’appareil).')}`, 600);
   toast('Fichier téléchargé');
 }
-$('#mExport').onclick = async () => {
-  $('#menuDlg').close();
-  const json = JSON.stringify({app:'pianran', version:5, groups: S.groups, accounts: S.accounts, flows: S.flows, months: S.months}, null, 2);
-  try { await deliverFile({name: `pianran-sauvegarde-${today()}.json`, mime: 'application/json', base64: b64(json), blob: new Blob([json], {type: 'application/json'}), mode: 'save', subject: 'Sauvegarde PIANRAN', text: 'Sauvegarde PIANRAN Budget'}); }
-  catch (e) { if (!/cancel/i.test(String(e && (e.message || e)))) toast('Échec de la sauvegarde'); }
-};
-$('#mImport').onclick = () => $('#importFile').click();
-$('#importFile').onchange = async e => {
-  const f = e.target.files[0]; e.target.value = ''; $('#menuDlg').close(); if (!f) return;
+/* =============== Sauvegardes dans le dossier de l'app =============== */
+const BK_DIR = 'PIANRAN/Sauvegardes', REP_DIR = 'PIANRAN/Rapports', AUTO_KEEP = 10;
+let bkDirType = 'DOCUMENTS';         // Documents/PIANRAN (visible dans Fichiers) ; repli : dossier interne de l'app
+let autoBackup = (() => { try { return localStorage.getItem('autoBackup') !== '0'; } catch { return true; } })();
+const bkLabel = () => bkDirType === 'DOCUMENTS' ? 'Documents › PIANRAN › Sauvegardes' : 'Dossier interne de l’application › PIANRAN › Sauvegardes';
+const stamp = () => { const d = new Date(); const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}h${p(d.getMinutes())}`; };
+const snapshot = () => JSON.stringify({app:'pianran', version:8, created: new Date().toISOString(), groups: S.groups, accounts: S.accounts, flows: S.flows, months: S.months}, null, 2);
+async function ensurePerm(){
+  try { const st = await native('Filesystem', 'checkPermissions', {}); if (st.publicStorage !== 'granted') await native('Filesystem', 'requestPermissions', {}); } catch {}
+}
+async function writeInApp(dir, name, data, encoding){
+  await ensurePerm();
+  const opts = {path: `${dir}/${name}`, data, recursive: true}; if (encoding) opts.encoding = encoding;
+  try { await native('Filesystem', 'writeFile', {...opts, directory: bkDirType}); }
+  catch (e) {
+    if (bkDirType !== 'DOCUMENTS') throw e;
+    bkDirType = 'DATA'; await put('meta', {key: 'bkDir', value: 'DATA'});
+    await native('Filesystem', 'writeFile', {...opts, directory: 'DATA'});
+  }
+  return `${dir}/${name}`;
+}
+async function listBackups(){
+  if (!isNative()) return [];
   try {
-    const d = JSON.parse(await f.text());
-    if (!Array.isArray(d.groups) || !Array.isArray(d.months)) throw 0;
-    if (!await confirmDlg('Restaurer ?', `${d.groups.length} catégories, ${(d.accounts || []).length} comptes et ${d.months.length} mois remplaceront les données actuelles.`, 'Restaurer')) return;
-    for (const s of ['groups','months','accounts','flows']) await clear(s);
-    for (const g of d.groups) await put('groups', g);
-    for (const m of d.months) await put('months', m);
-    for (const a of d.accounts || []) await put('accounts', a);
-    for (const x of d.flows || []) await put('flows', x);
-    await loadAll(); render(); toast('Données restaurées');
-  } catch { toast('Fichier invalide'); }
+    const r = await native('Filesystem', 'readdir', {path: BK_DIR, directory: bkDirType});
+    return (r.files || []).filter(f => (f.name || f).toString().endsWith('.json'))
+      .map(f => typeof f === 'string' ? {name: f, mtime: 0, size: 0} : f)
+      .sort((a, b) => (b.mtime || 0) - (a.mtime || 0) || b.name.localeCompare(a.name));
+  } catch { return []; }
+}
+async function backupNow(kind = 'manuel', silent = false){
+  if (!isNative()){
+    const json = snapshot();
+    await deliverFile({name: `pianran-sauvegarde-${stamp()}.json`, mime: 'application/json', base64: b64(json), blob: new Blob([json], {type: 'application/json'}), mode: 'download', subject: 'Sauvegarde PIANRAN', text: ''});
+    await put('meta', {key: 'lastBackup', value: Date.now()}); return;
+  }
+  const name = `${kind === 'manuel' ? 'pianran' : kind}-${stamp()}.json`;
+  await writeInApp(BK_DIR, name, snapshot(), 'utf8');
+  await put('meta', {key: 'lastBackup', value: Date.now()});
+  if (kind !== 'manuel'){
+    const autos = (await listBackups()).filter(f => f.name.startsWith(kind + '-'));
+    for (const f of autos.slice(AUTO_KEEP)) { try { await native('Filesystem', 'deleteFile', {path: `${BK_DIR}/${f.name}`, directory: bkDirType}); } catch {} }
+  }
+  if (!silent) toast('Sauvegardé : ' + name);
+}
+async function autoBackupIfDue(){
+  if (!isNative() || !autoBackup) return;
+  const last = (await get('meta', 'lastBackup'))?.value || 0;
+  if (Date.now() - last < 20 * 3600 * 1000) return;
+  try { await backupNow('auto', true); } catch {}
+}
+async function restoreData(d, source){
+  if (!Array.isArray(d.groups) || !Array.isArray(d.months)) throw new Error('format');
+  const when = d.created ? ' du ' + new Date(d.created).toLocaleString('fr-FR', {dateStyle: 'medium', timeStyle: 'short'}) : '';
+  if (!await confirmDlg('Restaurer cette sauvegarde ?', `Sauvegarde${when} (${source}) : ${d.groups.length} catégories, ${(d.accounts || []).length} comptes, ${d.months.length} mois. Elle remplacera les données actuelles. Une copie de sécurité des données actuelles sera faite avant.`, 'Restaurer', {danger: true})) return false;
+  try { if (isNative()) await backupNow('avant-restauration', true); } catch {}
+  for (const st of ['groups','months','accounts','flows']) await clear(st);
+  for (const g of d.groups) await put('groups', g);
+  for (const m of d.months) await put('months', m);
+  for (const a of d.accounts || []) await put('accounts', a);
+  for (const x of d.flows || []) await put('flows', x);
+  await loadAll(); render(); toast('Données restaurées');
+  return true;
+}
+const kindLabel = n => n.startsWith('auto-') ? 'Automatique' : n.startsWith('avant-restauration-') ? 'Avant restauration' : n.startsWith('archive-') ? 'À l’archivage' : 'Manuelle';
+const fileDate = f => {
+  const m = f.name.match(/(\d{4})-(\d{2})-(\d{2})_(\d{2})h(\d{2})/);
+  const d = m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]) : (f.mtime ? new Date(f.mtime) : null);
+  return d ? d.toLocaleString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : f.name;
+};
+async function renderBackups(){
+  const last = (await get('meta', 'lastBackup'))?.value;
+  const native_ = isNative();
+  const files = await listBackups();
+  $('#bkBody').innerHTML = `
+    <div class="balance" style="--c:var(--black)">
+      <div class="k">Dossier sur le téléphone</div>
+      <div style="font-weight:800;font-size:16px;overflow-wrap:anywhere">${native_ ? esc(bkLabel()) : 'Indisponible dans le navigateur : la sauvegarde est téléchargée.'}</div>
+      <div class="s"><span>Dernière sauvegarde : <b>${last ? new Date(last).toLocaleString('fr-FR', {dateStyle: 'medium', timeStyle: 'short'}) : 'jamais'}</b></span></div>
+    </div>
+    ${native_ ? `<ul style="margin-top:12px"><li><button type="button" class="swrow" role="switch" id="swAuto" aria-checked="${autoBackup}" style="padding:6px 12px"><span class="t"><b>Sauvegarde automatique</b><small>Une fois par jour à l'ouverture et à chaque archivage de mois. Les ${AUTO_KEEP} plus récentes sont gardées.</small></span><span class="switch" aria-hidden="true"></span></button></li></ul>` : ''}
+    <h3>Sauvegardes enregistrées</h3>
+    ${files.length ? `<ul>${files.map(f => `<li>
+        <button class="hrow" data-bk="${esc(f.name)}" aria-label="Restaurer la sauvegarde du ${esc(fileDate(f))}">
+          <span style="flex:1;min-width:0"><span class="t1" style="display:block;text-transform:capitalize">${esc(fileDate(f))}</span><span class="t2">${kindLabel(f.name)}${f.size ? ' · ' + Math.max(1, Math.round(f.size / 1024)) + ' Ko' : ''}</span></span>
+          ${icon('i-undo')}</button>
+        <button class="edit" data-bkdel="${esc(f.name)}" aria-label="Supprimer la sauvegarde du ${esc(fileDate(f))}">${icon('i-trash')}</button></li>`).join('')}</ul>
+      <p style="font-size:13px;color:var(--text-2);margin:8px 4px">Touchez une sauvegarde pour la restaurer.</p>`
+      : `<div class="start" style="margin:0"><p>${native_ ? 'Aucune sauvegarde dans le dossier pour l’instant.' : 'Les sauvegardes sont téléchargées sur l’appareil.'}</p></div>`}
+    <h3>Autres options</h3>
+    <ul>
+      <li><button class="hrow" id="bkPick">${icon('i-up')}<span style="flex:1"><span class="t1" style="display:block">Restaurer depuis un autre fichier</span><span class="t2">Après une réinstallation, ou un fichier reçu</span></span></button></li>
+      ${native_ ? `<li><button class="hrow" id="bkShare">${icon('i-mail')}<span style="flex:1"><span class="t1" style="display:block">Envoyer une copie ailleurs</span><span class="t2">Google Drive, WhatsApp, email… (en cas de perte du téléphone)</span></span></button></li>` : ''}
+    </ul>
+    <p style="font-size:13px;color:var(--text-2);margin:12px 4px">${bkDirType === 'DOCUMENTS' ? 'Le dossier Documents › PIANRAN reste sur le téléphone même si l’application est désinstallée. Vous le voyez dans l’app Fichiers.' : 'Ce dossier interne est effacé si l’application est désinstallée : envoyez aussi une copie ailleurs.'}</p>`;
+  $('#swAuto')?.addEventListener('click', () => { autoBackup = !autoBackup; try { localStorage.setItem('autoBackup', autoBackup ? '1' : '0'); } catch {} renderBackups(); });
+  $('#bkPick').onclick = () => $('#importFile').click();
+  $('#bkShare')?.addEventListener('click', async () => {
+    const json = snapshot();
+    try { await deliverFile({name: `pianran-sauvegarde-${stamp()}.json`, mime: 'application/json', base64: b64(json), blob: new Blob([json]), mode: 'mail', subject: 'Sauvegarde PIANRAN', text: 'Sauvegarde PIANRAN Budget'}); }
+    catch (e) { if (!/cancel/i.test(String(e && (e.message || e)))) toast('Échec de l’envoi'); }
+  });
+}
+$('#bkBody').addEventListener('click', async e => {
+  const r = e.target.closest('[data-bk]'), dl = e.target.closest('[data-bkdel]');
+  if (r){
+    try {
+      const f = await native('Filesystem', 'readFile', {path: `${BK_DIR}/${r.dataset.bk}`, directory: bkDirType, encoding: 'utf8'});
+      if (await restoreData(JSON.parse(f.data), r.dataset.bk)) $('#bkDlg').close();
+    } catch { toast('Impossible de lire cette sauvegarde'); }
+  } else if (dl){
+    if (!await confirmDlg('Supprimer cette sauvegarde ?', `Le fichier ${dl.dataset.bkdel} sera supprimé du téléphone.`, 'Supprimer', {danger: true})) return;
+    try { await native('Filesystem', 'deleteFile', {path: `${BK_DIR}/${dl.dataset.bkdel}`, directory: bkDirType}); toast('Sauvegarde supprimée'); } catch { toast('Suppression impossible'); }
+    renderBackups();
+  }
+});
+$('#mBackup').onclick = async () => { $('#menuDlg').close(); await renderBackups(); $('#bkDlg').showModal(); };
+$('#bkNow').onclick = async () => {
+  const b = $('#bkNow'); b.disabled = true;
+  try { await backupNow('manuel'); await renderBackups(); }
+  catch (e) { if (!/cancel/i.test(String(e && (e.message || e)))) toast('Échec de la sauvegarde'); }
+  finally { b.disabled = false; }
+};
+$('#importFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { if (await restoreData(JSON.parse(await f.text()), f.name)) $('#bkDlg').close(); } catch { toast('Fichier invalide : choisissez une sauvegarde PIANRAN (.json)'); }
 };
 
 /* =============== Rapport annuel =============== */
@@ -1235,6 +1354,8 @@ $('#chPin').onclick = async () => {
     const saved = await get('meta', 'lock');
     if (saved && saved.enabled && saved.hash){ L = {enabled: true, salt: saved.salt, hash: saved.hash, bio: !!saved.bio}; await checkBio(); lockNow(); }
     await setup(); await loadAll(); render();
+    const bd = await get('meta', 'bkDir'); if (bd && bd.value) bkDirType = bd.value;
+    setTimeout(autoBackupIfDue, 1500);
   } catch (e) { console.error(e); document.body.insertAdjacentHTML('afterbegin', '<p style="padding:16px;color:#B42318">Stockage indisponible sur cet appareil.</p>'); }
 })();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
