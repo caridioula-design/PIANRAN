@@ -2,5 +2,5 @@
   "appId": "ci.pianran.budget",
   "appName": "PIANRAN Budget",
   "webDir": "www",
-  "android": { "backgroundColor": "#0F5F57" }
+  "android": { "backgroundColor": "#FFD000" }
 }

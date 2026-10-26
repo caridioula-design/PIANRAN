@@ -3,92 +3,106 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0F5F57">
+<meta name="theme-color" content="#FFD000">
 <title>PIANRAN Budget</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <style>
 :root{
-  --bg:#F4F6F5; --surface:#FFFFFF; --surface-2:#EEF2F1; --border:#D5DDDB;
-  --text:#14201D; --text-2:#4A5754; --primary:#0F5F57; --on-primary:#FFFFFF; --primary-soft:#DDEFEC;
-  --done:#1E6B3A; --done-soft:#E3F2E8; --danger:#B42318; --scrim:rgba(10,20,18,.5); --head:#0F5F57;
+  --yellow:#FFD000; --yellow-soft:#FFF4C2; --yellow-line:#E6BC00;
+  --bg:#F6F6F2; --white:#FFFFFF; --black:#111111; --text-2:#4D4D4D; --border:#DCDCD4;
+  --danger:#B42318; --scrim:rgba(0,0,0,.5);
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root{
-  --bg:#0E1513; --surface:#17201E; --surface-2:#1F2A27; --border:#33413D;
-  --text:#E6EDEB; --text-2:#A9B7B3; --primary:#6CCFC1; --on-primary:#062420; --primary-soft:#1D3833;
-  --done:#7DD69A; --done-soft:#1A2E22; --danger:#FF8A80; --scrim:rgba(0,0,0,.6); --head:#163B36;
-  color-scheme:dark;
-}}
 *{box-sizing:border-box} [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;min-height:100dvh;-webkit-tap-highlight-color:transparent}
-button,input{font:inherit;color:inherit}
+body{margin:0;background:var(--bg);color:var(--black);font:400 16px/1.5 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;min-height:100dvh;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
 button{cursor:pointer;touch-action:manipulation}
 .num{font-variant-numeric:tabular-nums;white-space:nowrap}
-:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:8px}
+:focus-visible{outline:3px solid var(--black);outline-offset:2px;border-radius:8px}
 .icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
-header{position:sticky;top:0;z-index:10;background:var(--head);color:#fff;padding:calc(env(safe-area-inset-top) + 8px) 8px 16px}
+/* En-tête jaune, texte noir */
+header{position:sticky;top:0;z-index:10;background:var(--yellow);color:var(--black);padding:calc(env(safe-area-inset-top) + 8px) 8px 14px;border-bottom:1px solid var(--yellow-line)}
 .bar-top{display:flex;align-items:center;gap:4px}
-.month{flex:1;text-align:center;font-weight:700;font-size:18px;text-transform:capitalize}
+.month{flex:1;text-align:center;font-weight:800;font-size:19px;text-transform:capitalize;margin:0}
 .ibtn{width:44px;height:44px;border:0;background:transparent;border-radius:999px;display:grid;place-items:center;color:inherit}
-.ibtn:active{background:rgba(255,255,255,.15)}
-.sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 8px 0}
-.sum > button,.sum > div{background:rgba(255,255,255,.12);border:0;border-radius:14px;padding:10px;text-align:left;min-height:64px;color:inherit}
-.sum .k{font-size:12px;opacity:.9;display:flex;align-items:center;gap:4px}
-.sum .v{font-weight:750;font-size:16px;overflow-wrap:anywhere;white-space:normal;line-height:1.3}
+.ibtn:active{background:rgba(0,0,0,.08)}
+.sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 8px 0}
+.sum > button,.sum > div{background:var(--white);border:1.5px solid var(--black);border-radius:14px;padding:8px 10px;text-align:left;min-height:62px;color:var(--black)}
+.sum > button:active{background:var(--yellow-soft)}
+.sum .k{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px}
 .sum .k .icon{width:14px;height:14px}
-.progress{margin:12px 8px 0;font-size:14px}
-.track{height:8px;border-radius:9px;background:rgba(255,255,255,.22);overflow:hidden;margin-top:6px}
-.track i{display:block;height:100%;background:currentColor;border-radius:9px;transform-origin:left;transition:transform 300ms cubic-bezier(.2,.8,.2,1)}
+.sum .v{font-weight:800;font-size:16px;line-height:1.3;overflow-wrap:anywhere;white-space:normal}
+.sum .neg{color:var(--danger)}
+.progress{margin:10px 8px 0;font-size:14px;font-weight:600}
+.track{height:10px;border-radius:9px;background:rgba(0,0,0,.14);overflow:hidden;margin-top:6px}
+.track i{display:block;height:100%;background:var(--black);border-radius:9px;transform-origin:left;transition:transform 300ms cubic-bezier(.2,.8,.2,1)}
 
-main{padding:12px 12px calc(96px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
-ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+main{padding:12px 12px calc(32px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+
+/* Sections */
+.group{margin-bottom:14px}
+.ghead{display:flex;align-items:center;gap:6px;padding:0 0 6px 4px}
+.gtitle{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;border:0;background:none;text-align:left;padding:6px 0;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.3px}
+.gtitle .num{font-weight:700;color:var(--text-2);text-transform:none;letter-spacing:0}
+.gtitle .icon{width:15px;height:15px;color:var(--text-2);align-self:center}
+.gadd{min-height:36px;padding:4px 12px;border-radius:999px;border:1.5px solid var(--black);background:var(--yellow);font-size:14px;font-weight:700;display:flex;align-items:center;gap:4px}
+.gadd .icon{width:16px;height:16px}
+.gadd:active{background:var(--yellow-line)}
+ul{list-style:none;margin:0;padding:0;background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden}
 li{display:flex;align-items:center;border-top:1px solid var(--border)}
 li:first-child{border-top:0}
-.check{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 4px 8px 14px;border:0;background:none;text-align:left;transition:background 150ms}
-.check:active{background:var(--surface-2)}
-.box{width:28px;height:28px;border-radius:8px;border:2px solid var(--text-2);display:grid;place-items:center;flex:none;transition:background 150ms,border-color 150ms}
-.box .icon{width:18px;height:18px;stroke-width:3;color:var(--on-primary);opacity:0;transform:scale(.6);transition:opacity 150ms,transform 150ms}
+.check{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 4px 8px 14px;border:0;background:none;text-align:left}
+.check:active{background:#F2F2EC}
+.box{width:28px;height:28px;border-radius:8px;border:2px solid var(--black);display:grid;place-items:center;flex:none;background:var(--white);transition:background 150ms}
+.box .icon{width:18px;height:18px;stroke-width:3.2;color:var(--yellow);opacity:0;transform:scale(.6);transition:opacity 150ms,transform 150ms}
 .name{flex:1;min-width:0;overflow-wrap:anywhere}
-.amt{font-weight:650}
-li.done{background:var(--done-soft)}
-li.done .box{background:var(--done);border-color:var(--done)}
+.amt{font-weight:700}
+li.done{background:var(--yellow-soft)}
+li.done .box{background:var(--black)}
 li.done .box .icon{opacity:1;transform:none}
 li.done .name{text-decoration:line-through;color:var(--text-2)}
-li.done .amt{color:var(--done)}
-.edit{width:48px;height:60px;border:0;background:none;color:var(--text-2);display:grid;place-items:center;flex:none}
-.edit .icon{width:18px;height:18px}
+.edit{width:48px;height:58px;border:0;background:none;color:var(--text-2);display:grid;place-items:center;flex:none}
+.edit .icon{width:19px;height:19px}
+.gempty{padding:14px;color:var(--text-2);font-size:14px;display:block}
 
-.add{width:100%;margin-top:12px;min-height:52px;border:2px dashed var(--border);background:none;border-radius:16px;font-weight:650;color:var(--primary);display:flex;align-items:center;justify-content:center;gap:8px}
-.add:active{background:var(--primary-soft)}
-.empty{text-align:center;color:var(--text-2);padding:32px 16px}
+.bigbtn{width:100%;min-height:52px;border-radius:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.bigbtn.dash{border:2px dashed #BDBDB3;background:none}
+.bigbtn.dash:active{background:var(--white)}
+.bigbtn.yellow{border:1.5px solid var(--black);background:var(--yellow)}
+.bigbtn.yellow:active{background:var(--yellow-line)}
+.bigbtn.white{border:1.5px solid var(--black);background:var(--white)}
+
+.start{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px 16px;text-align:center}
+.start h2{margin:0 0 4px;font-size:19px}
+.start p{margin:0 0 8px;color:var(--text-2)}
 
 /* Feuilles */
-dialog{border:0;padding:0;margin:auto auto 0;width:100%;max-width:520px;border-radius:22px 22px 0 0;background:var(--surface);color:var(--text)}
+dialog{border:0;padding:0;margin:auto auto 0;width:100%;max-width:520px;border-radius:22px 22px 0 0;background:var(--white);color:var(--black)}
 dialog::backdrop{background:var(--scrim)}
 @media (min-width:600px){dialog{margin:auto;border-radius:22px}}
-dialog form{padding:16px 20px calc(20px + env(safe-area-inset-bottom))}
+dialog form{padding:18px 20px calc(20px + env(safe-area-inset-bottom))}
 dialog h2{margin:0 0 12px;font-size:19px}
 .field{margin-bottom:14px}
-.field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
-.field input{width:100%;min-height:52px;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);font-size:18px}
-.field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
-.field .err{color:var(--danger);font-size:13px;margin-top:4px}
+.field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px}
+.field input,.field select{width:100%;min-height:52px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--white);font-size:18px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--black);box-shadow:0 0 0 3px var(--yellow)}
+.field .err{color:var(--danger);font-size:13px;margin-top:4px;font-weight:600}
 .field .err:empty{display:none}
 .row{display:flex;gap:10px;margin-top:6px}
-.btn{flex:1;min-height:50px;border-radius:12px;border:1px solid var(--border);background:var(--surface);font-weight:650;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn.primary{background:var(--primary);color:var(--on-primary);border-color:transparent}
-.btn.danger{color:var(--danger);background:none}
+.btn{flex:1;min-height:50px;border-radius:12px;border:1.5px solid var(--black);background:var(--white);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--yellow)}
+.btn.primary:active{background:var(--yellow-line)}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
 .menu button{width:100%;display:flex;align-items:center;gap:12px;min-height:56px;border:0;background:none;text-align:left;padding:0 4px;border-radius:10px;font-weight:600}
-.menu button:active{background:var(--surface-2)}
-.menu .danger{color:var(--danger)}
+.menu button:active{background:var(--yellow-soft)}
 .menu p{color:var(--text-2);font-size:13px;margin:12px 4px 0}
 
-.toast{position:fixed;left:16px;right:16px;bottom:calc(24px + env(safe-area-inset-bottom));margin:0 auto;max-width:440px;background:var(--text);color:var(--bg);padding:12px 16px;border-radius:14px;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity 160ms,transform 200ms;z-index:50}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));margin:0 auto;max-width:440px;background:var(--black);color:var(--white);padding:12px 16px;border-radius:14px;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity 160ms,transform 200ms;z-index:50}
 .toast.show{opacity:1;transform:none;pointer-events:auto}
-.toast button{border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;min-height:40px}
+.toast button{border:0;background:none;color:var(--yellow);font-weight:800;min-height:40px}
 @media (prefers-reduced-motion: reduce){*{transition-duration:1ms!important}}
 </style>
 </head>
@@ -103,13 +117,15 @@ dialog h2{margin:0 0 12px;font-size:19px}
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5M12 3v12"/></symbol>
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6M9 14h6"/></symbol>
 </svg>
 
 <header>
   <div class="bar-top">
     <button class="ibtn" id="prev" aria-label="Mois précédent"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
-    <h1 class="month" id="month" aria-live="polite" style="margin:0"></h1>
+    <h1 class="month" id="month" aria-live="polite"></h1>
     <button class="ibtn" id="next" aria-label="Mois suivant"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
     <button class="ibtn" id="menuBtn" aria-label="Menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
   </div>
@@ -124,22 +140,33 @@ dialog h2{margin:0 0 12px;font-size:19px}
   </div>
 </header>
 
-<main>
-  <ul id="list" aria-label="Liste des dépenses du mois"></ul>
-  <button class="add" id="addBtn"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Ajouter une ligne</button>
-</main>
+<main id="main"></main>
 
-<!-- Ligne -->
+<!-- Dépense -->
 <dialog id="itemDlg" aria-labelledby="itemTitle">
   <form id="itemForm" novalidate>
-    <h2 id="itemTitle">Ligne</h2>
-    <div class="field"><label for="iName">Nom</label><input id="iName" maxlength="40" autocomplete="off"><div class="err" id="iNameErr" role="alert"></div></div>
+    <h2 id="itemTitle">Dépense</h2>
+    <div class="field"><label for="iName">Nom de la dépense</label><input id="iName" maxlength="40" autocomplete="off"><div class="err" id="iNameErr" role="alert"></div></div>
     <div class="field"><label for="iAmt">Montant (FCFA)</label><input id="iAmt" inputmode="numeric" autocomplete="off" class="num"><div class="err" id="iAmtErr" role="alert"></div></div>
+    <div class="field"><label for="iGroup">Catégorie</label><select id="iGroup"></select></div>
     <div class="row">
       <button type="button" class="btn danger" id="iDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
-      <button type="button" class="btn" data-close>Annuler</button>
-      <button type="submit" class="btn primary">OK</button>
+      <button type="submit" class="btn primary">Enregistrer</button>
     </div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button></div>
+  </form>
+</dialog>
+
+<!-- Catégorie -->
+<dialog id="groupDlg" aria-labelledby="groupTitle">
+  <form id="groupForm" novalidate>
+    <h2 id="groupTitle">Catégorie</h2>
+    <div class="field"><label for="gName">Nom de la catégorie</label><input id="gName" maxlength="30" autocomplete="off"><div class="err" id="gNameErr" role="alert"></div></div>
+    <div class="row">
+      <button type="button" class="btn danger" id="gDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
+      <button type="submit" class="btn primary">Enregistrer</button>
+    </div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button></div>
   </form>
 </dialog>
 
@@ -148,7 +175,7 @@ dialog h2{margin:0 0 12px;font-size:19px}
   <form id="budgetForm" novalidate>
     <h2 id="budgetTitle">Budget du mois</h2>
     <div class="field"><label for="bAmt">Salaire + autres revenus (FCFA)</label><input id="bAmt" inputmode="numeric" autocomplete="off" class="num"></div>
-    <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">OK</button></div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">Enregistrer</button></div>
   </form>
 </dialog>
 
@@ -156,12 +183,13 @@ dialog h2{margin:0 0 12px;font-size:19px}
 <dialog id="menuDlg" aria-labelledby="menuTitle">
   <form method="dialog" class="menu">
     <h2 id="menuTitle">Menu</h2>
+    <button type="button" id="mCopy"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span id="mCopyLabel">Reconduire le mois précédent</span></button>
     <button type="button" id="mUncheck"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>Tout décocher ce mois-ci</button>
     <button type="button" id="mExport"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Sauvegarder mes données</button>
     <button type="button" id="mImport"><svg class="icon" aria-hidden="true"><use href="#i-up"/></svg>Restaurer une sauvegarde</button>
     <input type="file" id="importFile" accept=".json,application/json" hidden>
-    <button value="close" class="sr-only">Fermer</button>
-    <p>Les données restent sur ce téléphone. Chaque mois a ses propres cases cochées ; la liste des lignes est la même pour tous les mois.</p>
+    <div class="row"><button value="close" class="btn" style="justify-content:center">Fermer</button></div>
+    <p>Les données restent sur ce téléphone. Chaque mois a sa propre liste.</p>
   </form>
 </dialog>
 
@@ -178,17 +206,16 @@ dialog h2{margin:0 0 12px;font-size:19px}
 
 <script>
 'use strict';
-/* ---------- Base IndexedDB ---------- */
+/* ---------- IndexedDB ---------- */
 let db;
 function openDB(){
   return new Promise((res, rej) => {
-    const r = indexedDB.open('pianran-budget', 2);
+    const r = indexedDB.open('pianran-budget', 3);
     r.onupgradeneeded = () => {
       const d = r.result;
-      if (!d.objectStoreNames.contains('categories')) d.createObjectStore('categories', {keyPath:'id'});
-      if (!d.objectStoreNames.contains('transactions')) d.createObjectStore('transactions', {keyPath:'id'});
-      if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta', {keyPath:'key'});
-      if (!d.objectStoreNames.contains('months')) d.createObjectStore('months', {keyPath:'month'});
+      for (const s of ['categories','transactions','meta','months','groups']){
+        if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, {keyPath: s === 'meta' ? 'key' : s === 'months' ? 'month' : 'id'});
+      }
     };
     r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
   });
@@ -218,108 +245,180 @@ const shift = (m, k) => { const [y, mo] = m.split('-').map(Number); const d = ne
 const label = m => { const [y, mo] = m.split('-').map(Number); return new Date(y, mo-1, 1).toLocaleDateString('fr-FR', {month:'long', year:'numeric'}); };
 ['#iAmt', '#bAmt'].forEach(s => $(s).addEventListener('input', e => { const n = parse(e.target.value); e.target.value = n ? fmt(n) : ''; }));
 
+/* ---------- Données par défaut ---------- */
+const DEFAULT = [
+  ['Nourriture', [['Nourriture maison',45000],['Sac de riz',14000],['Plaquette d’œufs',2500],['Petit-déjeuner',8000]]],
+  ['Maison', [['Maison',40000],['Gaz',5500],['Énergie CIE / SODECI',5000],['Canal+',10200]]],
+  ['Travail', [['Transport travail',25000],['Nourriture travail',30000]]],
+  ['Famille', [['Madame',10000],['James scolarité',10000],['Petit-déjeuner James',10000],['Cours de renforcement',3000]]],
+  ['Engagements', [['Dette ARESO',5050],['Tontine',10100]]],
+  ['Santé & épargne', [['Santé',20000],['Épargne',20000]]]
+];
+
 /* ---------- État ---------- */
-const S = { month: curMonth(), items: [], m: null };
+const S = { month: curMonth(), groups: [], m: null };   // m = {month, budget, items:[{id,name,amount,groupId,paid}]} ou null
 
-async function seed(){
-  if (await get('meta', 'seeded')) return;
-  const base = [['Nourriture maison',45000],['Sac de riz',14000],['Gaz',5500],['Énergie CIE / SODECI',5000],['Canal+',10200],['Maison',40000],
-    ['Transport travail',25000],['Nourriture travail',30000],['Plaquette d’œufs',2500],['Petit-déjeuner',8000],['Madame',10000],
-    ['James scolarité',10000],['Petit-déjeuner James',10000],['Cours de renforcement',3000],['Dette ARESO',5050],['Tontine',10100],['Santé',20000],['Épargne',20000]];
-  for (let i = 0; i < base.length; i++) await put('categories', {id: uid(), name: base[i][0], planned: base[i][1], order: i});
-  await put('meta', {key:'seeded', value:true});
-}
-
-async function loadMonth(){
-  let m = await get('months', S.month);
-  if (!m){
-    // budget repris du dernier mois connu, sinon 285 000
-    const months = (await all('months')).filter(x => x.month < S.month).sort((a,b) => b.month.localeCompare(a.month));
-    m = {month: S.month, budget: months[0] ? months[0].budget : 285000, paid: {}};
+async function setup(){
+  if (await get('meta', 'v3')) return;
+  // création des catégories par défaut
+  const groups = DEFAULT.map(([name], i) => ({id: uid(), name, order: i}));
+  for (const g of groups) await put('groups', g);
+  const groupFor = name => { const k = DEFAULT.findIndex(([, l]) => l.some(([n]) => n === name)); return groups[k >= 0 ? k : 0].id; };
+  // reprise des lignes de la version 2 si elles existent
+  const old = (await all('categories')).sort((a,b) => a.order - b.order);
+  const lines = old.length ? old.map(c => ({name: c.name.replace('Maison (loyer)','Maison'), amount: c.planned || 0, groupId: groupFor(c.name.replace('Maison (loyer)','Maison')), oldId: c.id}))
+                           : DEFAULT.flatMap(([, l], k) => l.map(([name, amount]) => ({name, amount, groupId: groups[k].id})));
+  const months = await all('months');
+  if (!months.some(m => m.month === S.month)) months.push({month: S.month, budget: 285000, paid: {}});
+  for (const m of months){
+    if (m.items) continue;
+    const paid = m.paid || {};
+    await put('months', {month: m.month, budget: m.budget ?? 285000, items: lines.map(l => ({id: uid(), name: l.name, amount: l.amount, groupId: l.groupId, paid: !!(l.oldId && paid[l.oldId])}))});
   }
-  S.m = m;
+  await put('meta', {key:'v3', value:true});
 }
+async function loadMonth(){ S.m = (await get('months', S.month)) || null; }
 const saveMonth = () => put('months', S.m);
+async function previousFilled(){
+  const ms = (await all('months')).filter(m => m.month < S.month && m.items && m.items.length).sort((a,b) => b.month.localeCompare(a.month));
+  return ms[0] || null;
+}
 
 /* ---------- Affichage ---------- */
-function render(){
+async function render(){
   $('#month').textContent = label(S.month);
-  const total = S.items.reduce((s, i) => s + i.planned, 0);
-  const done = S.items.filter(i => S.m.paid[i.id]);
-  const paid = done.reduce((s, i) => s + i.planned, 0);
-  const reste = S.m.budget - total;
-  $('#vBudget').textContent = money(S.m.budget);
+  const items = S.m ? S.m.items : [];
+  const total = items.reduce((s, i) => s + i.amount, 0);
+  const done = items.filter(i => i.paid), paid = done.reduce((s, i) => s + i.amount, 0);
+  const budget = S.m ? S.m.budget : 0, reste = budget - total;
+  $('#vBudget').textContent = money(budget);
   $('#vTotal').textContent = money(total);
   $('#vReste').textContent = (reste < 0 ? '−' : '') + money(Math.abs(reste));
-  $('#pCount').textContent = `${done.length} / ${S.items.length} payé${done.length > 1 ? 's' : ''} · ${money(paid)}`;
+  $('#vReste').classList.toggle('neg', reste < 0);
+  $('#pCount').textContent = `${done.length} / ${items.length} payé${done.length > 1 ? 's' : ''} · ${money(paid)}`;
   $('#pLeft').textContent = 'À payer : ' + money(total - paid);
   $('#pBar').style.transform = `scaleX(${total ? paid / total : 0})`;
 
-  $('#list').innerHTML = S.items.length ? S.items.map(i => {
-    const ok = !!S.m.paid[i.id];
-    return `<li class="${ok ? 'done' : ''}">
-      <button class="check" role="checkbox" aria-checked="${ok}" data-id="${i.id}">
-        <span class="box" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
-        <span class="name">${esc(i.name)}</span><span class="amt num">${fmt(i.planned)}</span>
-      </button>
-      <button class="edit" data-edit="${i.id}" aria-label="Modifier ${esc(i.name)}"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></button>
-    </li>`;
-  }).join('') : `<li class="empty" style="display:block">Aucune ligne. Ajoutez vos dépenses du mois.</li>`;
+  if (!S.m){
+    const prev = await previousFilled();
+    $('#main').innerHTML = `<div class="start">
+      <h2>Nouveau mois</h2>
+      <p>${prev ? `Reprendre la liste de ${label(prev.month)} ? Les montants et le budget sont recopiés, toutes les cases sont décochées.` : 'Aucun mois précédent à reprendre.'}</p>
+      ${prev ? `<button class="bigbtn yellow" id="copyBtn"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Reconduire ${label(prev.month)}</button>` : ''}
+      <button class="bigbtn white" id="blankBtn"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Commencer une liste vide</button></div>`;
+    $('#copyBtn')?.addEventListener('click', () => copyFrom(prev));
+    $('#blankBtn').onclick = async () => { S.m = {month: S.month, budget: prev ? prev.budget : 0, items: []}; await saveMonth(); render(); };
+    return;
+  }
+
+  const known = new Set(S.groups.map(g => g.id));
+  const orphans = items.filter(i => !known.has(i.groupId));
+  const sections = S.groups.map(g => ({g, list: items.filter(i => i.groupId === g.id)}));
+  if (orphans.length) sections.push({g: {id: '', name: 'Sans catégorie'}, list: orphans});
+  $('#main').innerHTML = sections.map(({g, list}) => {
+    const sub = list.reduce((s, i) => s + i.amount, 0);
+    return `<section class="group" aria-label="${esc(g.name)}">
+      <div class="ghead">
+        ${g.id ? `<button class="gtitle" data-gedit="${g.id}" aria-label="Modifier la catégorie ${esc(g.name)}">${esc(g.name)} <span class="num">${fmt(sub)}</span><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></button>`
+               : `<div class="gtitle">${esc(g.name)} <span class="num">${fmt(sub)}</span></div>`}
+        <button class="gadd" data-add="${g.id}" aria-label="Ajouter une dépense dans ${esc(g.name)}"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Dépense</button>
+      </div>
+      <ul>${list.length ? list.map(i => `<li class="${i.paid ? 'done' : ''}">
+        <button class="check" role="checkbox" aria-checked="${!!i.paid}" data-id="${i.id}">
+          <span class="box" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
+          <span class="name">${esc(i.name)}</span><span class="amt num">${fmt(i.amount)}</span></button>
+        <button class="edit" data-edit="${i.id}" aria-label="Modifier ou supprimer ${esc(i.name)}"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></button></li>`).join('')
+        : `<li><span class="gempty">Aucune dépense dans cette catégorie.</span></li>`}</ul></section>`;
+  }).join('') + `<button class="bigbtn dash" id="newGroup"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Nouvelle catégorie</button>`;
+  $('#newGroup').onclick = () => openGroup();
 }
 
-/* ---------- Actions ---------- */
-$('#list').addEventListener('click', async e => {
-  const c = e.target.closest('[data-id]'), ed = e.target.closest('[data-edit]');
-  if (c){
-    const id = c.dataset.id;
-    if (S.m.paid[id]) delete S.m.paid[id]; else S.m.paid[id] = true;
-    if (navigator.vibrate) navigator.vibrate(10);
-    await saveMonth(); render();
-    document.querySelector(`[data-id="${id}"]`)?.focus();
-  }
-  if (ed) openItem(S.items.find(i => i.id === ed.dataset.edit));
-});
+/* ---------- Mois ---------- */
+async function copyFrom(prev){
+  S.m = {month: S.month, budget: prev.budget, items: prev.items.map(i => ({...i, id: uid(), paid: false}))};
+  await saveMonth(); render(); toast(`${label(prev.month)} reconduit`);
+}
 $('#prev').onclick = async () => { S.month = shift(S.month, -1); await loadMonth(); render(); };
 $('#next').onclick = async () => { S.month = shift(S.month, 1); await loadMonth(); render(); };
 
+/* ---------- Clics dans la liste ---------- */
+$('#main').addEventListener('click', async e => {
+  const c = e.target.closest('[data-id]'), ed = e.target.closest('[data-edit]'), add = e.target.closest('[data-add]'), ge = e.target.closest('[data-gedit]');
+  if (c){
+    const it = S.m.items.find(i => i.id === c.dataset.id); it.paid = !it.paid;
+    if (navigator.vibrate) navigator.vibrate(10);
+    await saveMonth(); await render(); document.querySelector(`[data-id="${it.id}"]`)?.focus();
+  }
+  else if (ed) openItem(S.m.items.find(i => i.id === ed.dataset.edit));
+  else if (add) openItem(null, add.dataset.add);
+  else if (ge) openGroup(S.groups.find(g => g.id === ge.dataset.gedit));
+});
+
+/* ---------- Dépense ---------- */
 let editing = null;
-function openItem(it = null){
+function openItem(it = null, groupId = ''){
   editing = it;
-  $('#itemTitle').textContent = it ? 'Modifier la ligne' : 'Nouvelle ligne';
+  $('#iGroup').innerHTML = S.groups.map(g => `<option value="${g.id}">${esc(g.name)}</option>`).join('') + `<option value="">Sans catégorie</option>`;
+  $('#itemTitle').textContent = it ? 'Modifier la dépense' : 'Nouvelle dépense';
   $('#iName').value = it ? it.name : '';
-  $('#iAmt').value = it ? fmt(it.planned) : '';
+  $('#iAmt').value = it ? fmt(it.amount) : '';
+  $('#iGroup').value = it ? (S.groups.some(g => g.id === it.groupId) ? it.groupId : '') : groupId;
   $('#iDel').hidden = !it;
   $('#iNameErr').textContent = $('#iAmtErr').textContent = '';
   $('#itemDlg').showModal(); setTimeout(() => $('#iName').focus(), 50);
 }
-$('#addBtn').onclick = () => openItem();
 $('#itemForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const name = $('#iName').value.trim(), planned = parse($('#iAmt').value);
-  $('#iNameErr').textContent = name ? '' : 'Donnez un nom.';
-  $('#iAmtErr').textContent = planned > 0 ? '' : 'Saisissez un montant.';
+  const name = $('#iName').value.trim(), amount = parse($('#iAmt').value), groupId = $('#iGroup').value;
+  $('#iNameErr').textContent = name ? '' : 'Donnez un nom à la dépense.';
+  $('#iAmtErr').textContent = amount > 0 ? '' : 'Saisissez un montant.';
   if (!name) return $('#iName').focus();
-  if (!planned) return $('#iAmt').focus();
-  const it = editing ? {...editing, name, planned} : {id: uid(), name, planned, order: S.items.length ? Math.max(...S.items.map(i => i.order)) + 1 : 0};
-  await put('categories', it);
-  S.items = S.items.filter(i => i.id !== it.id).concat(it).sort((a,b) => a.order - b.order);
-  $('#itemDlg').close(); render(); toast(editing ? 'Ligne modifiée' : 'Ligne ajoutée');
+  if (!amount) return $('#iAmt').focus();
+  if (editing) Object.assign(editing, {name, amount, groupId});
+  else S.m.items.push({id: uid(), name, amount, groupId, paid: false});
+  await saveMonth(); $('#itemDlg').close(); render(); toast(editing ? 'Dépense modifiée' : 'Dépense ajoutée');
 });
 $('#iDel').onclick = async () => {
-  const it = editing; $('#itemDlg').close();
-  await del('categories', it.id);
-  S.items = S.items.filter(i => i.id !== it.id); render();
-  toast(`« ${it.name} » supprimée`, async () => { await put('categories', it); S.items = S.items.concat(it).sort((a,b) => a.order - b.order); render(); });
+  const it = editing, pos = S.m.items.indexOf(it); $('#itemDlg').close();
+  S.m.items.splice(pos, 1); await saveMonth(); render();
+  toast(`« ${it.name} » supprimée`, async () => { S.m.items.splice(pos, 0, it); await saveMonth(); render(); });
 };
 
-$('#budgetBtn').onclick = () => { $('#bAmt').value = fmt(S.m.budget); $('#budgetDlg').showModal(); setTimeout(() => $('#bAmt').select(), 50); };
+/* ---------- Catégorie ---------- */
+let editingG = null;
+function openGroup(g = null){
+  editingG = g;
+  $('#groupTitle').textContent = g ? 'Modifier la catégorie' : 'Nouvelle catégorie';
+  $('#gName').value = g ? g.name : '';
+  $('#gDel').hidden = !g; $('#gNameErr').textContent = '';
+  $('#groupDlg').showModal(); setTimeout(() => $('#gName').focus(), 50);
+}
+$('#groupForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('#gName').value.trim();
+  if (!name){ $('#gNameErr').textContent = 'Donnez un nom à la catégorie.'; return $('#gName').focus(); }
+  const g = editingG ? {...editingG, name} : {id: uid(), name, order: S.groups.length ? Math.max(...S.groups.map(x => x.order)) + 1 : 0};
+  await put('groups', g);
+  S.groups = S.groups.filter(x => x.id !== g.id).concat(g).sort((a,b) => a.order - b.order);
+  $('#groupDlg').close(); render(); toast(editingG ? 'Catégorie renommée' : 'Catégorie créée');
+});
+$('#gDel').onclick = async () => {
+  const g = editingG; $('#groupDlg').close();
+  const n = S.m ? S.m.items.filter(i => i.groupId === g.id).length : 0;
+  if (!await confirmDlg('Supprimer la catégorie ?', `« ${g.name} » sera supprimée.` + (n ? ` Ses ${n} dépense(s) de ce mois seront aussi supprimées.` : ''), 'Supprimer')) return;
+  const before = S.m ? [...S.m.items] : null;
+  await del('groups', g.id); S.groups = S.groups.filter(x => x.id !== g.id);
+  if (S.m){ S.m.items = S.m.items.filter(i => i.groupId !== g.id); await saveMonth(); }
+  render();
+  toast('Catégorie supprimée', async () => { await put('groups', g); S.groups = S.groups.concat(g).sort((a,b) => a.order - b.order); if (before){ S.m.items = before; await saveMonth(); } render(); });
+};
+
+/* ---------- Budget ---------- */
+$('#budgetBtn').onclick = () => { if (!S.m) return toast('Commencez d’abord la liste du mois'); $('#bAmt').value = fmt(S.m.budget); $('#budgetDlg').showModal(); setTimeout(() => $('#bAmt').select(), 50); };
 $('#budgetForm').addEventListener('submit', async e => { e.preventDefault(); S.m.budget = parse($('#bAmt').value); await saveMonth(); $('#budgetDlg').close(); render(); });
 
 document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
 document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
-
-/* ---------- Menu ---------- */
-$('#menuBtn').onclick = () => $('#menuDlg').showModal();
 function confirmDlg(title, text, yes){
   return new Promise(res => {
     $('#confTitle').textContent = title; $('#confText').textContent = text; $('#confYes').textContent = yes;
@@ -327,14 +426,25 @@ function confirmDlg(title, text, yes){
     d.addEventListener('close', () => res(d.returnValue === 'yes'), {once:true}); d.showModal();
   });
 }
-$('#mUncheck').onclick = async () => {
+
+/* ---------- Menu ---------- */
+$('#menuBtn').onclick = () => $('#menuDlg').showModal();
+$('#mCopy').onclick = async () => {
   $('#menuDlg').close();
-  const before = {...S.m.paid}; S.m.paid = {}; await saveMonth(); render();
-  toast('Tout est décoché', async () => { S.m.paid = before; await saveMonth(); render(); });
+  const prev = await previousFilled();
+  if (!prev) return toast('Aucun mois précédent à reprendre');
+  if (S.m && S.m.items.length && !await confirmDlg('Reconduire ?', `La liste de ${label(S.month)} sera remplacée par celle de ${label(prev.month)}, cases décochées.`, 'Reconduire')) return;
+  const before = S.m; await copyFrom(prev);
+  if (before) toast(`${label(prev.month)} reconduit`, async () => { S.m = before; await saveMonth(); render(); });
+};
+$('#mUncheck').onclick = async () => {
+  $('#menuDlg').close(); if (!S.m) return;
+  const before = S.m.items.map(i => i.paid); S.m.items.forEach(i => i.paid = false); await saveMonth(); render();
+  toast('Tout est décoché', async () => { S.m.items.forEach((i, k) => i.paid = before[k]); await saveMonth(); render(); });
 };
 $('#mExport').onclick = async () => {
   $('#menuDlg').close();
-  const data = JSON.stringify({app:'pianran', version:2, items: S.items, months: await all('months')}, null, 2);
+  const data = JSON.stringify({app:'pianran', version:3, groups: S.groups, months: await all('months')}, null, 2);
   const name = `pianran-sauvegarde-${new Date().toISOString().slice(0,10)}.json`;
   const blob = new Blob([data], {type:'application/json'});
   try { const f = new File([blob], name, {type:'application/json'});
@@ -347,12 +457,12 @@ $('#importFile').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; $('#menuDlg').close(); if (!f) return;
   try {
     const d = JSON.parse(await f.text());
-    if (!Array.isArray(d.items) || !Array.isArray(d.months)) throw 0;
-    if (!await confirmDlg('Restaurer ?', `${d.items.length} lignes et ${d.months.length} mois remplaceront les données actuelles.`, 'Restaurer')) return;
-    await clear('categories'); await clear('months');
-    for (const i of d.items) await put('categories', i);
+    if (!Array.isArray(d.groups) || !Array.isArray(d.months)) throw 0;
+    if (!await confirmDlg('Restaurer ?', `${d.groups.length} catégories et ${d.months.length} mois remplaceront les données actuelles.`, 'Restaurer')) return;
+    await clear('groups'); await clear('months');
+    for (const g of d.groups) await put('groups', g);
     for (const m of d.months) await put('months', m);
-    S.items = (await all('categories')).sort((a,b) => a.order - b.order); await loadMonth(); render(); toast('Données restaurées');
+    S.groups = (await all('groups')).sort((a,b) => a.order - b.order); await loadMonth(); render(); toast('Données restaurées');
   } catch { toast('Fichier invalide'); }
 };
 
@@ -368,10 +478,10 @@ function toast(msg, undo){
   try {
     db = await openDB();
     navigator.storage?.persist?.().catch(() => {});
-    await seed();
-    S.items = (await all('categories')).map(c => ({...c, planned: c.planned || 0})).sort((a,b) => a.order - b.order);
-    await loadMonth(); render();
-  } catch (e) { document.body.insertAdjacentHTML('afterbegin', '<p style="padding:16px;color:#B42318">Stockage indisponible sur cet appareil.</p>'); }
+    await setup();
+    S.groups = (await all('groups')).sort((a,b) => a.order - b.order);
+    await loadMonth(); await render();
+  } catch (e) { console.error(e); document.body.insertAdjacentHTML('afterbegin', '<p style="padding:16px;color:#B42318">Stockage indisponible sur cet appareil.</p>'); }
 })();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>

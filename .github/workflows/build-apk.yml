@@ -23,7 +23,7 @@ jobs:
       - name: Icônes de l'app
         run: |
           npm install --no-save @capacitor/assets
-          npx capacitor-assets generate --android --iconBackgroundColor '#0F5F57' --splashBackgroundColor '#0F5F57'
+          npx capacitor-assets generate --android --iconBackgroundColor '#FFD000' --splashBackgroundColor '#FFD000'
       - run: npx cap sync android
       - name: Compiler l'APK
         run: |
