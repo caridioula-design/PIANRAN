@@ -21,10 +21,7 @@ jobs:
       - name: Icônes de l'app
         run: |
           npm install --no-save @capacitor/assets
-          mkdir -p assets
-          cp www/icons/icon-512.png assets/icon-only.png
-          cp www/icons/maskable-512.png assets/icon-foreground.png
-          npx capacitor-assets generate --android --iconBackgroundColor '#0F5F57' --splashBackgroundColor '#0F5F57' || true
+          npx capacitor-assets generate --android --iconBackgroundColor '#0F5F57' --splashBackgroundColor '#0F5F57'
       - run: npx cap sync android
       - name: Compiler l'APK
         run: |
