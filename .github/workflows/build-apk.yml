@@ -26,7 +26,17 @@ jobs:
           cp www/icons/maskable-512.png assets/icon-foreground.png
           npx capacitor-assets generate --android --iconBackgroundColor '#0F5F57' --splashBackgroundColor '#0F5F57' || true
       - run: npx cap sync android
-      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - name: Compiler l'APK
+        run: |
+          cd android && chmod +x gradlew
+          set +e
+          ./gradlew assembleDebug --no-daemon > ../gradle.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then
+            grep -A12 -E "What went wrong|FAILURE|error:" ../gradle.log | head -60 | sed 's/%/%25/g' | tr '\n' '|' | sed 's/^/::error title=Gradle::/' ; echo
+            tail -30 ../gradle.log
+          fi
+          exit $code
       - uses: actions/upload-artifact@v5
         with:
           name: PIANRAN-Budget-apk
