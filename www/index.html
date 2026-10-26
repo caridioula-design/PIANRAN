@@ -189,6 +189,8 @@ dialog.lock::backdrop{background:var(--yellow)}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform 150ms}
 [aria-checked="true"] .switch{background:var(--black)}
 [aria-checked="true"] .switch::after{transform:translateX(20px);background:var(--yellow)}
+.dzone{margin-top:22px;padding-top:14px;border-top:1px dashed var(--border)}
+.btn.danger.solid{background:var(--danger);color:#fff;border-color:var(--danger)}
 @media (prefers-reduced-motion: reduce){*{transition-duration:1ms!important}}
 </style>
 </head>
@@ -257,11 +259,8 @@ dialog.lock::backdrop{background:var(--yellow)}
     <div class="field"><label for="iGroup">Catégorie</label><select id="iGroup"></select></div>
     <div class="field"><label for="iAcct">Verser sur un compte</label><select id="iAcct"></select>
       <div class="help">Quand la case est cochée, le montant s'ajoute au solde du compte choisi.</div></div>
-    <div class="row">
-      <button type="button" class="btn danger" id="iDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
-      <button type="submit" class="btn primary">Enregistrer</button>
-    </div>
-    <div class="row"><button type="button" class="btn" data-close>Annuler</button></div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">Enregistrer</button></div>
+    <div class="dzone" id="iDelZone"><button type="button" class="btn danger" id="iDel" style="width:100%"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer cette dépense</button></div>
   </form>
 </dialog>
 
@@ -271,11 +270,8 @@ dialog.lock::backdrop{background:var(--yellow)}
     <h2 id="groupTitle">Catégorie</h2>
     <div class="field"><label for="gName">Nom de la catégorie</label><input id="gName" maxlength="30" autocomplete="off"><div class="err" id="gNameErr" role="alert"></div></div>
     <fieldset class="field"><legend>Couleur</legend><div class="swatches" id="gSw"></div></fieldset>
-    <div class="row">
-      <button type="button" class="btn danger" id="gDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
-      <button type="submit" class="btn primary">Enregistrer</button>
-    </div>
-    <div class="row"><button type="button" class="btn" data-close>Annuler</button></div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">Enregistrer</button></div>
+    <div class="dzone" id="gDelZone"><button type="button" class="btn danger" id="gDel" style="width:100%"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer cette catégorie</button></div>
   </form>
 </dialog>
 
@@ -313,11 +309,8 @@ dialog.lock::backdrop{background:var(--yellow)}
     <h2 id="acctSetTitle">Compte</h2>
     <div class="field"><label for="aName">Nom du compte</label><input id="aName" maxlength="30" autocomplete="off"><div class="err" id="aNameErr" role="alert"></div></div>
     <fieldset class="field"><legend>Couleur</legend><div class="swatches" id="aSw"></div></fieldset>
-    <div class="row">
-      <button type="button" class="btn danger" id="aDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
-      <button type="submit" class="btn primary">Enregistrer</button>
-    </div>
-    <div class="row"><button type="button" class="btn" data-close>Annuler</button></div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">Enregistrer</button></div>
+    <div class="dzone" id="aDelZone"><button type="button" class="btn danger" id="aDel" style="width:100%"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer ce compte</button></div>
   </form>
 </dialog>
 
@@ -330,11 +323,8 @@ dialog.lock::backdrop{background:var(--yellow)}
     <div class="field"><label for="fNote">Motif</label><input id="fNote" maxlength="60" autocomplete="off" list="motifList">
       <datalist id="motifList"><option value="Pharmacie"><option value="Consultation"><option value="Analyses"><option value="Hôpital"><option value="Urgence"><option value="Achat important"><option value="Scolarité"><option value="Solde de départ"></datalist></div>
     <div class="field"><label for="fDate">Date</label><input id="fDate" type="date"></div>
-    <div class="row">
-      <button type="button" class="btn danger" id="fDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
-      <button type="submit" class="btn primary">Enregistrer</button>
-    </div>
-    <div class="row"><button type="button" class="btn" data-close>Annuler</button></div>
+    <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">Enregistrer</button></div>
+    <div class="dzone" id="fDelZone"><button type="button" class="btn danger" id="fDel" style="width:100%"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer ce mouvement</button></div>
   </form>
 </dialog>
 
@@ -359,7 +349,7 @@ dialog.lock::backdrop{background:var(--yellow)}
 <dialog id="menuDlg" aria-labelledby="menuTitle">
   <form method="dialog" class="menu">
     <h2 id="menuTitle">Menu</h2>
-    <button type="button" id="mLock"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Verrouillage (code PIN, empreinte)</button>
+    <button type="button" id="mLock"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Sécurité et garde-fous</button>
     <button type="button" id="mReport"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>Rapport annuel</button>
     <button type="button" id="mCopy"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Reconduire le mois précédent</button>
     <button type="button" id="mUncheck"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>Tout décocher ce mois-ci</button>
@@ -374,9 +364,10 @@ dialog.lock::backdrop{background:var(--yellow)}
 <!-- Réglages de verrouillage -->
 <dialog id="secDlg" aria-labelledby="secTitle">
   <form method="dialog">
-    <h2 id="secTitle">Verrouillage</h2>
+    <h2 id="secTitle">Sécurité et garde-fous</h2>
     <button type="button" class="swrow" role="switch" id="swPin" aria-checked="false"><span class="t"><b>Code PIN</b><small>Demandé à l'ouverture et après 30 secondes hors de l'app</small></span><span class="switch" aria-hidden="true"></span></button>
     <button type="button" class="swrow" role="switch" id="swBio" aria-checked="false"><span class="t"><b>Empreinte digitale</b><small id="bioHelp">Déverrouiller avec le doigt au lieu du code</small></span><span class="switch" aria-hidden="true"></span></button>
+    <button type="button" class="swrow" role="switch" id="swConf" aria-checked="true"><span class="t"><b>Confirmer avant de cocher</b><small>Demande « Marquer comme payé ? » à chaque case. Décocher demande toujours une confirmation.</small></span><span class="switch" aria-hidden="true"></span></button>
     <button type="button" class="swrow" id="chPin"><span class="t"><b>Changer le code PIN</b></span><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
     <div class="row"><button value="close" class="btn">Fermer</button></div>
   </form>
@@ -407,6 +398,7 @@ dialog.lock::backdrop{background:var(--yellow)}
   <form method="dialog">
     <h2 id="confTitle"></h2>
     <p id="confText" style="color:var(--text-2);margin-top:0"></p>
+    <div class="field" id="confTypeF" hidden><label for="confType" id="confTypeL"></label><input id="confType" autocomplete="off" autocapitalize="characters"></div>
     <div class="row"><button value="no" class="btn">Annuler</button><button value="yes" class="btn primary" id="confYes">Confirmer</button></div>
   </form>
 </dialog>
@@ -643,15 +635,26 @@ const goMonth = k => { S.month = shift(S.month, k); S.m = S.months.find(m => m.m
 $('#prev').onclick = () => goMonth(-1);
 $('#next').onclick = () => goMonth(1);
 
+let lastTap = 0;
+let confirmCheck = (() => { try { return localStorage.getItem('confirmCheck') !== '0'; } catch { return true; } })();
 document.querySelector('main').addEventListener('click', async e => {
   const c = e.target.closest('[data-id]'), ed = e.target.closest('[data-edit]'), add = e.target.closest('[data-add]'),
         ge = e.target.closest('[data-gedit]'), ac = e.target.closest('[data-acct]');
   if (c){
-    const it = S.m.items.find(i => i.id === c.dataset.id); it.paid = !it.paid;
+    const it = S.m.items.find(i => i.id === c.dataset.id);
+    if (Date.now() - lastTap < 600) return;          // anti double-tap
+    lastTap = Date.now();
+    const a = aById(it.accountId);
+    if (it.paid){
+      if (!await confirmDlg('Décocher cette ligne ?', `« ${it.name} » (${money(it.amount)}) repassera en « non payé ».` + (a ? ` Le versement sera retiré du compte ${a.name}.` : ''), 'Oui, décocher')) return;
+    } else if (confirmCheck){
+      if (!await confirmDlg('Marquer comme payé ?', `« ${it.name} » · ${money(it.amount)}` + (a ? ` — sera versé sur le compte ${a.name}.` : ''), 'Oui, payé')) return;
+    }
+    it.paid = !it.paid;
     if (navigator.vibrate) navigator.vibrate(10);
     await saveMonth(); render(); document.querySelector(`[data-id="${it.id}"]`)?.focus();
-    const a = aById(it.accountId);
-    if (a) toast(it.paid ? `${money(it.amount)} versés sur ${a.name}` : `Versement retiré de ${a.name}`);
+    const undo = async () => { it.paid = !it.paid; await saveMonth(); render(); };
+    toast(it.paid ? (a ? `${money(it.amount)} versés sur ${a.name}` : `« ${it.name} » payé`) : (a ? `Versement retiré de ${a.name}` : `« ${it.name} » décoché`), undo);
   }
   else if (ed) openItem(S.m.items.find(i => i.id === ed.dataset.edit));
   else if (add) openItem(null, add.dataset.add);
@@ -694,6 +697,7 @@ $('#itemForm').addEventListener('submit', async e => {
 });
 $('#iDel').onclick = async () => {
   const it = editing, pos = S.m.items.indexOf(it); $('#itemDlg').close();
+  if (!await confirmDlg('Supprimer la dépense ?', `« ${it.name} » (${money(it.amount)}) sera retirée de ${label(S.month)}.` + (it.paid && aById(it.accountId) ? ` Son versement sur le compte ${aById(it.accountId).name} sera aussi retiré.` : ''), 'Supprimer', {danger: true})) return;
   S.m.items.splice(pos, 1); await saveMonth(); render();
   toast(`« ${it.name} » supprimée`, async () => { S.m.items.splice(pos, 0, it); await saveMonth(); render(); });
 };
@@ -720,7 +724,7 @@ $('#groupForm').addEventListener('submit', async e => {
 $('#gDel').onclick = async () => {
   const g = editingG; $('#groupDlg').close();
   const n = S.m ? S.m.items.filter(i => i.groupId === g.id).length : 0;
-  if (!await confirmDlg('Supprimer la catégorie ?', `« ${g.name} » sera supprimée.` + (n ? ` Ses ${n} dépense(s) de ce mois seront aussi supprimées.` : ''), 'Supprimer')) return;
+  if (!await confirmDlg('Supprimer la catégorie ?', `« ${g.name} » sera supprimée.` + (n ? ` Ses ${n} dépense(s) de ce mois seront aussi supprimées.` : ''), 'Supprimer', {danger: true, typed: n ? 'SUPPRIMER' : null})) return;
   const before = S.m ? [...S.m.items] : null;
   await del('groups', g.id); S.groups = S.groups.filter(x => x.id !== g.id);
   if (S.m){ S.m.items = S.m.items.filter(i => i.groupId !== g.id); await saveMonth(); }
@@ -746,7 +750,16 @@ $('#incList').addEventListener('input', e => {
   const it = incDraft.find(i => i.id === row.dataset.inc);
   if (e.target.dataset.k === 'amount'){ fmtInput(e.target); it.amount = parse(e.target.value); incPreview(); } else it.name = e.target.value;
 });
-$('#incList').addEventListener('click', e => { const d = e.target.closest('[data-incdel]'); if (d){ incDraft = incDraft.filter(i => i.id !== d.dataset.incdel); incRender(); } });
+$('#incList').addEventListener('click', async e => {
+  const d = e.target.closest('[data-incdel]'); if (!d) return;
+  const it = incDraft.find(i => i.id === d.dataset.incdel);
+  if (it.amount > 0){
+    $('#incDlg').close();
+    const ok = await confirmDlg('Retirer cette source ?', `« ${it.name || 'Revenu'} » (${money(it.amount)}) sera retirée quand vous enregistrerez.`, 'Retirer', {danger: true});
+    $('#incDlg').showModal(); if (!ok) return;
+  }
+  incDraft = incDraft.filter(i => i.id !== it.id); incRender();
+});
 $('#incAdd').onclick = () => { const n = {id: uid(), name: '', amount: 0}; incDraft.push(n); incRender(); document.getElementById('in-' + n.id).focus(); };
 $('#budgetBtn').onclick = () => {
   if (!S.m) return toast('Commencez d’abord la liste du mois');
@@ -774,7 +787,11 @@ function renderAccount(){
         <b class="num ${x.amount < 0 ? 'neg' : 'pos'}">${x.amount < 0 ? '−' : '+'} ${money(Math.abs(x.amount))}</b>`;
       return `<li>${x.id ? `<button class="hrow" data-flow="${x.id}" aria-label="Modifier : ${esc(x.label)}">${inner}</button>` : `<div class="hrow">${inner}</div>`}</li>`;
     }).join('')}</ul>` : `<div class="start" style="margin:0"><p>Aucun mouvement. Cochez la ligne liée à ce compte dans votre liste du mois, ou faites un ajout manuel (par exemple le solde de départ).</p></div>`}
-    <p style="font-size:13px;color:var(--text-2);margin:12px 4px">Les versements viennent des lignes cochées liées à ce compte. Les sorties ne changent pas le reste du mois : elles sont payées avec l'argent du compte.</p>`;
+    <p style="font-size:13px;color:var(--text-2);margin:12px 4px">Les versements viennent des lignes cochées liées à ce compte. Les sorties ne changent pas le reste du mois : elles sont payées avec l'argent du compte.</p>
+    <div class="dzone"><button class="btn" id="acctRename" style="width:100%">${icon('i-edit')}Renommer ou changer la couleur</button>
+      <button class="btn danger" id="acctDelBtn" style="width:100%;margin-top:10px">${icon('i-trash')}Supprimer ce compte</button></div>`;
+  $('#acctRename').onclick = () => openAcctSet(a);
+  $('#acctDelBtn').onclick = () => { editingA = a; $('#aDel').click(); };
 }
 $('#acctBody').addEventListener('click', e => { const f = e.target.closest('[data-flow]'); if (f) openFlow(S.flows.find(x => x.id === f.dataset.flow)); });
 
@@ -800,13 +817,14 @@ $('#acctSetForm').addEventListener('submit', async e => {
   toast(editingA ? 'Compte modifié' : 'Compte créé');
 });
 $('#aDel').onclick = async () => {
-  const a = editingA; $('#acctSetDlg').close();
-  if (!await confirmDlg('Supprimer le compte ?', `« ${a.name} » et ses ajouts/sorties manuels seront supprimés. Les lignes du budget restent, sans lien vers ce compte.`, 'Supprimer')) return;
+  const a = editingA; if ($('#acctSetDlg').open) $('#acctSetDlg').close();
+  const b = balance(a.id);
+  if (!await confirmDlg('Supprimer le compte ?', `« ${a.name} » (solde ${signed(b)}) et tout son historique d'ajouts et de sorties seront supprimés définitivement. Les lignes du budget restent, sans lien vers ce compte.`, 'Supprimer le compte', {danger: true, typed: 'SUPPRIMER'})) return;
   await del('accounts', a.id); S.accounts = S.accounts.filter(x => x.id !== a.id);
   for (const f of S.flows.filter(f => f.accountId === a.id)) await del('flows', f.id);
   S.flows = S.flows.filter(f => f.accountId !== a.id);
   for (const m of S.months){ let ch = false; m.items.forEach(i => { if (i.accountId === a.id){ i.accountId = null; ch = true; } }); if (ch) await put('months', m); }
-  $('#acctDlg').close(); render(); toast('Compte supprimé');
+  $('#acctDlg').close(); render(); toast(`Compte « ${a.name} » supprimé`);
 };
 
 let editingF = null, flowType = 'out';
@@ -841,6 +859,7 @@ $('#flowForm').addEventListener('submit', async e => {
 });
 $('#fDel').onclick = async () => {
   const f = editingF; $('#flowDlg').close();
+  if (!await confirmDlg('Supprimer ce mouvement ?', `${f.type === 'out' ? 'Sortie' : 'Ajout'} de ${money(f.amount)}${f.note ? ' (' + f.note + ')' : ''} du ${dayLabel(f.date)}. Le solde du compte sera recalculé.`, 'Supprimer', {danger: true})) return;
   await del('flows', f.id); S.flows = S.flows.filter(x => x.id !== f.id); renderAccount(); render();
   toast('Mouvement supprimé', async () => { await put('flows', f); S.flows.push(f); renderAccount(); render(); });
 };
@@ -848,11 +867,17 @@ $('#fDel').onclick = async () => {
 /* =============== Dialogues =============== */
 document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
 document.querySelectorAll('dialog:not(.full)').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
-function confirmDlg(title, text, yes){
+function confirmDlg(title, text, yes, opt = {}){
   return new Promise(res => {
     $('#confTitle').textContent = title; $('#confText').textContent = text; $('#confYes').textContent = yes;
+    $('#confYes').className = 'btn ' + (opt.danger ? 'danger solid' : 'primary');
+    const tf = $('#confTypeF'), ti = $('#confType');
+    tf.hidden = !opt.typed; ti.value = '';
+    $('#confYes').disabled = !!opt.typed;
+    if (opt.typed){ $('#confTypeL').textContent = `Pour confirmer, tapez ${opt.typed}`; ti.oninput = () => $('#confYes').disabled = ti.value.trim().toUpperCase() !== opt.typed.toUpperCase(); }
     const d = $('#confDlg'); d.returnValue = '';
     d.addEventListener('close', () => res(d.returnValue === 'yes'), {once:true}); d.showModal();
+    setTimeout(() => (opt.typed ? ti : d.querySelector('button[value=no]')).focus(), 50);
   });
 }
 let tt;
@@ -874,6 +899,8 @@ $('#mCopy').onclick = async () => {
 };
 $('#mUncheck').onclick = async () => {
   $('#menuDlg').close(); if (!S.m) return;
+  const n = S.m.items.filter(i => i.paid).length; if (!n) return toast('Aucune case cochée');
+  if (!await confirmDlg('Tout décocher ?', `${n} ligne(s) payée(s) de ${label(S.month)} repasseront en « non payé ». Les versements sur les comptes seront retirés.`, 'Tout décocher', {danger: true})) return;
   const before = S.m.items.map(i => i.paid); S.m.items.forEach(i => i.paid = false); await saveMonth(); render();
   toast('Tout est décoché', async () => { S.m.items.forEach((i, k) => i.paid = before[k]); await saveMonth(); render(); });
 };
@@ -1111,7 +1138,12 @@ function renderSec(){
   $('#swBio').disabled = !L.enabled || !bioAvailable;
   $('#bioHelp').textContent = !bioAvailable ? 'Non disponible sur cet appareil (ou aucune empreinte enregistrée dans Android)' : (!L.enabled ? 'Activez d’abord le code PIN' : 'Déverrouiller avec le doigt au lieu du code');
   $('#chPin').hidden = !L.enabled;
+  $('#swConf').setAttribute('aria-checked', String(confirmCheck));
 }
+$('#swConf').onclick = () => {
+  confirmCheck = !confirmCheck; try { localStorage.setItem('confirmCheck', confirmCheck ? '1' : '0'); } catch {}
+  renderSec(); toast(confirmCheck ? 'Confirmation avant de cocher activée' : 'Confirmation avant de cocher désactivée');
+};
 $('#mLock').onclick = async () => { $('#menuDlg').close(); await checkBio(); renderSec(); $('#secDlg').showModal(); };
 $('#swPin').onclick = async () => {
   if (!L.enabled){
