@@ -1,6 +1,6 @@
 {
   "name": "pianran-budget",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
   "description": "PIANRAN Budget - suivi de budget hors-ligne (IndexedDB)",
   "scripts": {
@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
-    "@capacitor/core": "^8.0.0"
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.0"

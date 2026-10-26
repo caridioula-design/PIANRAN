@@ -24,6 +24,11 @@ jobs:
         run: |
           npm install --no-save @capacitor/assets
           npx capacitor-assets generate --android --iconBackgroundColor '#FFD000' --splashBackgroundColor '#FFD000'
+      - name: Permission d'écriture (Android 9-10)
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          sed -i 's#<application#<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <application android:requestLegacyExternalStorage="true"#' $M
+          grep -n "WRITE_EXTERNAL\|requestLegacy" $M
       - run: npx cap sync android
       - name: Compiler l'APK
         run: |

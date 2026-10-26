@@ -103,6 +103,33 @@ dialog h2{margin:0 0 12px;font-size:19px}
 .toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));margin:0 auto;max-width:440px;background:var(--black);color:var(--white);padding:12px 16px;border-radius:14px;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity 160ms,transform 200ms;z-index:50}
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .toast button{border:0;background:none;color:var(--yellow);font-weight:800;min-height:40px}
+.preview{background:var(--yellow-soft);border:1px solid var(--yellow-line);border-radius:12px;padding:10px 12px;margin:-4px 0 14px;font-size:14px;display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+.preview b{font-weight:800;text-align:right}
+.preview .neg{color:var(--danger)}
+.inc{display:flex;gap:8px;align-items:flex-end;margin-bottom:10px}
+.inc .field{margin:0}
+.inc .n{flex:1.3;min-width:0}.inc .a{flex:1;min-width:0}
+.inc .field input{font-size:16px}
+.inc .del{width:48px;height:52px;border:1.5px solid var(--border);border-radius:12px;background:none;color:var(--danger);display:grid;place-items:center;flex:none}
+.linkbtn{border:0;background:none;color:var(--black);font-weight:700;text-decoration:underline;min-height:44px;padding:0;display:flex;align-items:center;gap:6px}
+dialog.full{margin:0;max-width:none;width:100%;height:100dvh;max-height:100dvh;border-radius:0}
+dialog.full .wrap{display:flex;flex-direction:column;height:100%}
+.rhead{background:var(--yellow);padding:calc(env(safe-area-inset-top) + 8px) 8px 10px;display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--yellow-line)}
+.rhead h2{flex:1;margin:0;text-align:center;font-size:18px}
+.rbody{flex:1;overflow:auto;padding:14px 12px 24px;background:var(--bg)}
+.rbody h3{font-size:15px;text-transform:uppercase;letter-spacing:.3px;margin:18px 4px 8px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpis > div{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px}
+.kpis .k{font-size:12px;font-weight:600;color:var(--text-2)}.kpis .v{font-weight:800;font-size:17px;overflow-wrap:anywhere}
+.tbl{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:13px}
+.tbl th{background:var(--yellow);text-align:right;padding:8px 6px;font-weight:800}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:8px 6px;border-top:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl td:first-child{white-space:normal;text-transform:capitalize}
+.tbl tr.tot td{font-weight:800;background:var(--yellow-soft)}
+.tbl .neg{color:var(--danger)}
+.tscroll{overflow-x:auto;border-radius:12px}
+.rfoot{display:flex;gap:10px;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--border)}
 @media (prefers-reduced-motion: reduce){*{transition-duration:1ms!important}}
 </style>
 </head>
@@ -119,6 +146,9 @@ dialog h2{margin:0 0 12px;font-size:19px}
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M8 17V11M13 17V7M18 17v-4"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6M9 14h6"/></symbol>
 </svg>
 
@@ -130,7 +160,7 @@ dialog h2{margin:0 0 12px;font-size:19px}
     <button class="ibtn" id="menuBtn" aria-label="Menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
   </div>
   <div class="sum">
-    <button id="budgetBtn" aria-label="Modifier le budget du mois"><div class="k">Budget <svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></div><div class="v num" id="vBudget"></div></button>
+    <button id="budgetBtn" aria-label="Voir et modifier les revenus du mois"><div class="k">Revenus <svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></div><div class="v num" id="vBudget"></div></button>
     <div><div class="k">Total</div><div class="v num" id="vTotal"></div></div>
     <div><div class="k">Reste</div><div class="v num" id="vReste"></div></div>
   </div>
@@ -148,6 +178,7 @@ dialog h2{margin:0 0 12px;font-size:19px}
     <h2 id="itemTitle">Dépense</h2>
     <div class="field"><label for="iName">Nom de la dépense</label><input id="iName" maxlength="40" autocomplete="off"><div class="err" id="iNameErr" role="alert"></div></div>
     <div class="field"><label for="iAmt">Montant (FCFA)</label><input id="iAmt" inputmode="numeric" autocomplete="off" class="num"><div class="err" id="iAmtErr" role="alert"></div></div>
+    <div class="preview" id="iPrev" aria-live="polite"></div>
     <div class="field"><label for="iGroup">Catégorie</label><select id="iGroup"></select></div>
     <div class="row">
       <button type="button" class="btn danger" id="iDel"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Supprimer</button>
@@ -170,19 +201,39 @@ dialog h2{margin:0 0 12px;font-size:19px}
   </form>
 </dialog>
 
-<!-- Budget -->
-<dialog id="budgetDlg" aria-labelledby="budgetTitle">
-  <form id="budgetForm" novalidate>
-    <h2 id="budgetTitle">Budget du mois</h2>
-    <div class="field"><label for="bAmt">Salaire + autres revenus (FCFA)</label><input id="bAmt" inputmode="numeric" autocomplete="off" class="num"></div>
+<!-- Revenus -->
+<dialog id="incDlg" aria-labelledby="incTitle">
+  <form id="incForm" novalidate>
+    <h2 id="incTitle">Revenus du mois</h2>
+    <div id="incList"></div>
+    <button type="button" class="linkbtn" id="incAdd"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Ajouter une source de revenu</button>
+    <div class="preview" id="incPrev" aria-live="polite" style="margin-top:10px"></div>
     <div class="row"><button type="button" class="btn" data-close>Annuler</button><button type="submit" class="btn primary">Enregistrer</button></div>
   </form>
+</dialog>
+
+<!-- Rapport annuel -->
+<dialog id="repDlg" class="full" aria-labelledby="repTitle">
+  <div class="wrap">
+    <div class="rhead">
+      <button class="ibtn" id="repPrev" aria-label="Année précédente"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
+      <h2 id="repTitle">Rapport</h2>
+      <button class="ibtn" id="repNext" aria-label="Année suivante"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
+      <button class="ibtn" data-close aria-label="Fermer le rapport"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="rbody" id="repBody"></div>
+    <div class="rfoot">
+      <button class="btn" id="repSave"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Télécharger</button>
+      <button class="btn primary" id="repMail"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Envoyer</button>
+    </div>
+  </div>
 </dialog>
 
 <!-- Menu -->
 <dialog id="menuDlg" aria-labelledby="menuTitle">
   <form method="dialog" class="menu">
     <h2 id="menuTitle">Menu</h2>
+    <button type="button" id="mReport"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>Rapport annuel</button>
     <button type="button" id="mCopy"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span id="mCopyLabel">Reconduire le mois précédent</span></button>
     <button type="button" id="mUncheck"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>Tout décocher ce mois-ci</button>
     <button type="button" id="mExport"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg>Sauvegarder mes données</button>
@@ -204,6 +255,8 @@ dialog h2{margin:0 0 12px;font-size:19px}
 
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg" style="flex:1"></span><button id="toastBtn" hidden>Annuler</button></div>
 
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
 <script>
 'use strict';
 /* ---------- IndexedDB ---------- */
@@ -243,7 +296,12 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const curMonth = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); };
 const shift = (m, k) => { const [y, mo] = m.split('-').map(Number); const d = new Date(y, mo-1+k, 1); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); };
 const label = m => { const [y, mo] = m.split('-').map(Number); return new Date(y, mo-1, 1).toLocaleDateString('fr-FR', {month:'long', year:'numeric'}); };
-['#iAmt', '#bAmt'].forEach(s => $(s).addEventListener('input', e => { const n = parse(e.target.value); e.target.value = n ? fmt(n) : ''; }));
+const fmtInput = el => { const n = parse(el.value); el.value = n ? fmt(n) : ''; };
+$('#iAmt').addEventListener('input', e => { fmtInput(e.target); itemPreview(); });
+const revenue = m => m ? (m.incomes || []).reduce((s, i) => s + i.amount, 0) : 0;
+const planned = m => m ? m.items.reduce((s, i) => s + i.amount, 0) : 0;
+const signed = n => (n < 0 ? '−' : '') + money(Math.abs(n));
+function normalize(m){ if (m && !m.incomes){ m.incomes = [{id: uid(), name: 'Salaire', amount: m.budget ?? 0}]; } if (m) delete m.budget; return m; }
 
 /* ---------- Données par défaut ---------- */
 const DEFAULT = [
@@ -277,10 +335,10 @@ async function setup(){
   }
   await put('meta', {key:'v3', value:true});
 }
-async function loadMonth(){ S.m = (await get('months', S.month)) || null; }
+async function loadMonth(){ S.m = normalize((await get('months', S.month)) || null); }
 const saveMonth = () => put('months', S.m);
 async function previousFilled(){
-  const ms = (await all('months')).filter(m => m.month < S.month && m.items && m.items.length).sort((a,b) => b.month.localeCompare(a.month));
+  const ms = (await all('months')).map(normalize).filter(m => m.month < S.month && m.items && m.items.length).sort((a,b) => b.month.localeCompare(a.month));
   return ms[0] || null;
 }
 
@@ -290,7 +348,7 @@ async function render(){
   const items = S.m ? S.m.items : [];
   const total = items.reduce((s, i) => s + i.amount, 0);
   const done = items.filter(i => i.paid), paid = done.reduce((s, i) => s + i.amount, 0);
-  const budget = S.m ? S.m.budget : 0, reste = budget - total;
+  const budget = revenue(S.m), reste = budget - total;
   $('#vBudget').textContent = money(budget);
   $('#vTotal').textContent = money(total);
   $('#vReste').textContent = (reste < 0 ? '−' : '') + money(Math.abs(reste));
@@ -303,11 +361,11 @@ async function render(){
     const prev = await previousFilled();
     $('#main').innerHTML = `<div class="start">
       <h2>Nouveau mois</h2>
-      <p>${prev ? `Reprendre la liste de ${label(prev.month)} ? Les montants et le budget sont recopiés, toutes les cases sont décochées.` : 'Aucun mois précédent à reprendre.'}</p>
+      <p>${prev ? `Reprendre la liste de ${label(prev.month)} ? Les dépenses et les revenus sont recopiés, toutes les cases sont décochées.` : 'Aucun mois précédent à reprendre.'}</p>
       ${prev ? `<button class="bigbtn yellow" id="copyBtn"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Reconduire ${label(prev.month)}</button>` : ''}
       <button class="bigbtn white" id="blankBtn"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Commencer une liste vide</button></div>`;
     $('#copyBtn')?.addEventListener('click', () => copyFrom(prev));
-    $('#blankBtn').onclick = async () => { S.m = {month: S.month, budget: prev ? prev.budget : 0, items: []}; await saveMonth(); render(); };
+    $('#blankBtn').onclick = async () => { S.m = {month: S.month, incomes: prev ? prev.incomes.map(i => ({...i, id: uid()})) : [{id: uid(), name: 'Salaire', amount: 0}], items: []}; await saveMonth(); render(); };
     return;
   }
 
@@ -335,7 +393,7 @@ async function render(){
 
 /* ---------- Mois ---------- */
 async function copyFrom(prev){
-  S.m = {month: S.month, budget: prev.budget, items: prev.items.map(i => ({...i, id: uid(), paid: false}))};
+  S.m = {month: S.month, incomes: prev.incomes.map(i => ({...i, id: uid()})), items: prev.items.map(i => ({...i, id: uid(), paid: false}))};
   await saveMonth(); render(); toast(`${label(prev.month)} reconduit`);
 }
 $('#prev').onclick = async () => { S.month = shift(S.month, -1); await loadMonth(); render(); };
@@ -364,8 +422,15 @@ function openItem(it = null, groupId = ''){
   $('#iAmt').value = it ? fmt(it.amount) : '';
   $('#iGroup').value = it ? (S.groups.some(g => g.id === it.groupId) ? it.groupId : '') : groupId;
   $('#iDel').hidden = !it;
+  itemPreview();
   $('#iNameErr').textContent = $('#iAmtErr').textContent = '';
   $('#itemDlg').showModal(); setTimeout(() => $('#iName').focus(), 50);
+}
+function itemPreview(){
+  const amt = parse($('#iAmt').value);
+  const total = planned(S.m) - (editing ? editing.amount : 0) + amt;
+  const reste = revenue(S.m) - total;
+  $('#iPrev').innerHTML = `<span>Revenus</span><b class="num">${money(revenue(S.m))}</b><span>Nouveau total</span><b class="num">${money(total)}</b><span>Reste</span><b class="num ${reste < 0 ? 'neg' : ''}">${signed(reste)}</b>`;
 }
 $('#itemForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -414,8 +479,149 @@ $('#gDel').onclick = async () => {
 };
 
 /* ---------- Budget ---------- */
-$('#budgetBtn').onclick = () => { if (!S.m) return toast('Commencez d’abord la liste du mois'); $('#bAmt').value = fmt(S.m.budget); $('#budgetDlg').showModal(); setTimeout(() => $('#bAmt').select(), 50); };
-$('#budgetForm').addEventListener('submit', async e => { e.preventDefault(); S.m.budget = parse($('#bAmt').value); await saveMonth(); $('#budgetDlg').close(); render(); });
+let incDraft = [];
+function incRow(i){
+  return `<div class="inc" data-inc="${i.id}">
+    <div class="field n"><label for="in-${i.id}">Source</label><input id="in-${i.id}" data-k="name" value="${esc(i.name)}" maxlength="30" list="srcList" autocomplete="off"></div>
+    <div class="field a"><label for="ia-${i.id}">Montant</label><input id="ia-${i.id}" data-k="amount" class="num" inputmode="numeric" value="${i.amount ? fmt(i.amount) : ''}" autocomplete="off"></div>
+    <button type="button" class="del" data-incdel="${i.id}" aria-label="Supprimer ${esc(i.name || 'cette source')}"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg></button></div>`;
+}
+function incRender(){ $('#incList').innerHTML = incDraft.map(incRow).join('') + '<datalist id="srcList"><option value="Salaire"><option value="Prime"><option value="Commerce"><option value="Loyer perçu"><option value="Tontine reçue"><option value="Autre revenu"></datalist>'; incPreview(); }
+function incPreview(){
+  const tot = incDraft.reduce((s, i) => s + i.amount, 0), reste = tot - planned(S.m);
+  $('#incPrev').innerHTML = `<span>Total revenus</span><b class="num">${money(tot)}</b><span>Dépenses prévues</span><b class="num">${money(planned(S.m))}</b><span>Reste</span><b class="num ${reste < 0 ? 'neg' : ''}">${signed(reste)}</b>`;
+}
+$('#incList').addEventListener('input', e => {
+  const row = e.target.closest('[data-inc]'); if (!row) return;
+  const it = incDraft.find(i => i.id === row.dataset.inc);
+  if (e.target.dataset.k === 'amount'){ fmtInput(e.target); it.amount = parse(e.target.value); incPreview(); }
+  else it.name = e.target.value;
+});
+$('#incList').addEventListener('click', e => {
+  const d = e.target.closest('[data-incdel]'); if (!d) return;
+  incDraft = incDraft.filter(i => i.id !== d.dataset.incdel); incRender();
+});
+$('#incAdd').onclick = () => { const n = {id: uid(), name: '', amount: 0}; incDraft.push(n); incRender(); document.getElementById('in-' + n.id).focus(); };
+$('#budgetBtn').onclick = () => {
+  if (!S.m) return toast('Commencez d’abord la liste du mois');
+  incDraft = S.m.incomes.map(i => ({...i})); incRender(); $('#incDlg').showModal();
+};
+$('#incForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  S.m.incomes = incDraft.filter(i => i.amount > 0 || i.name.trim()).map(i => ({...i, name: i.name.trim() || 'Revenu'}));
+  await saveMonth(); $('#incDlg').close(); render(); toast('Revenus enregistrés');
+});
+
+/* ---------- Rapport annuel ---------- */
+let repYear = Number(S.month.slice(0, 4)), repData = null;
+async function buildReport(year){
+  const months = (await all('months')).map(normalize).filter(m => m.month.startsWith(year + '-')).sort((a,b) => a.month.localeCompare(b.month));
+  const gname = id => (S.groups.find(g => g.id === id) || {name: 'Sans catégorie'}).name;
+  const rows = months.map(m => { const r = revenue(m), p = planned(m), pay = m.items.filter(i => i.paid).reduce((s, i) => s + i.amount, 0); return {month: m.month, rev: r, plan: p, paid: pay, reste: r - p}; });
+  const sum = k => rows.reduce((s, r) => s + r[k], 0);
+  const cats = {}, srcs = {};
+  months.forEach(m => {
+    m.items.forEach(i => { const n = gname(i.groupId); cats[n] = cats[n] || {plan: 0, paid: 0}; cats[n].plan += i.amount; if (i.paid) cats[n].paid += i.amount; });
+    m.incomes.forEach(i => srcs[i.name] = (srcs[i.name] || 0) + i.amount);
+  });
+  return {year, rows, tot: {rev: sum('rev'), plan: sum('plan'), paid: sum('paid'), reste: sum('reste')},
+    cats: Object.entries(cats).sort((a,b) => b[1].plan - a[1].plan), srcs: Object.entries(srcs).sort((a,b) => b[1] - a[1])};
+}
+const shortMonth = m => { const [y, mo] = m.split('-').map(Number); return new Date(y, mo-1, 1).toLocaleDateString('fr-FR', {month:'long'}); };
+async function showReport(){
+  repData = await buildReport(repYear); const d = repData;
+  $('#repTitle').textContent = 'Rapport ' + repYear;
+  if (!d.rows.length){
+    $('#repBody').innerHTML = `<div class="start"><h2>Aucune donnée</h2><p>Aucun mois enregistré pour ${repYear}.</p></div>`;
+  } else {
+    $('#repBody').innerHTML = `
+      <div class="kpis">
+        <div><div class="k">Revenus de l'année</div><div class="v num">${money(d.tot.rev)}</div></div>
+        <div><div class="k">Dépenses prévues</div><div class="v num">${money(d.tot.plan)}</div></div>
+        <div><div class="k">Dépenses payées</div><div class="v num">${money(d.tot.paid)}</div></div>
+        <div><div class="k">Reste cumulé</div><div class="v num ${d.tot.reste < 0 ? 'neg' : ''}" style="${d.tot.reste < 0 ? 'color:var(--danger)' : ''}">${signed(d.tot.reste)}</div></div>
+      </div>
+      <h3>Mois par mois</h3>
+      <div class="tscroll"><table class="tbl"><thead><tr><th scope="col">Mois</th><th scope="col">Revenus</th><th scope="col">Prévu</th><th scope="col">Payé</th><th scope="col">Reste</th></tr></thead><tbody>
+        ${d.rows.map(r => `<tr><td>${shortMonth(r.month)}</td><td>${fmt(r.rev)}</td><td>${fmt(r.plan)}</td><td>${fmt(r.paid)}</td><td class="${r.reste < 0 ? 'neg' : ''}">${r.reste < 0 ? '−' : ''}${fmt(Math.abs(r.reste))}</td></tr>`).join('')}
+        <tr class="tot"><td>Total</td><td>${fmt(d.tot.rev)}</td><td>${fmt(d.tot.plan)}</td><td>${fmt(d.tot.paid)}</td><td>${d.tot.reste < 0 ? '−' : ''}${fmt(Math.abs(d.tot.reste))}</td></tr></tbody></table></div>
+      <h3>Par catégorie</h3>
+      <div class="tscroll"><table class="tbl"><thead><tr><th scope="col">Catégorie</th><th scope="col">Prévu</th><th scope="col">Payé</th><th scope="col">Part</th></tr></thead><tbody>
+        ${d.cats.map(([n, c]) => `<tr><td style="text-transform:none">${esc(n)}</td><td>${fmt(c.plan)}</td><td>${fmt(c.paid)}</td><td>${d.tot.plan ? Math.round(c.plan / d.tot.plan * 100) : 0} %</td></tr>`).join('')}</tbody></table></div>
+      <h3>Sources de revenus</h3>
+      <div class="tscroll"><table class="tbl"><thead><tr><th scope="col">Source</th><th scope="col">Montant</th><th scope="col">Part</th></tr></thead><tbody>
+        ${d.srcs.map(([n, v]) => `<tr><td style="text-transform:none">${esc(n)}</td><td>${fmt(v)}</td><td>${d.tot.rev ? Math.round(v / d.tot.rev * 100) : 0} %</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  $('#repSave').disabled = $('#repMail').disabled = !d.rows.length;
+}
+$('#mReport').onclick = () => { $('#menuDlg').close(); repYear = Number(S.month.slice(0, 4)); showReport(); $('#repDlg').showModal(); };
+$('#repPrev').onclick = () => { repYear--; showReport(); };
+$('#repNext').onclick = () => { repYear++; showReport(); };
+
+function reportPDF(d){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit: 'mm', format: 'a4'});
+  const n = v => fmt(v), sg = v => (v < 0 ? '-' : '') + fmt(Math.abs(v));
+  const head = {fillColor: [255, 208, 0], textColor: [17, 17, 17], fontStyle: 'bold'};
+  const ra = {didParseCell: c => { if (c.column.index > 0) c.cell.styles.halign = 'right'; }};
+  const foot = {fillColor: [255, 244, 194], textColor: [17, 17, 17], fontStyle: 'bold'};
+  doc.setFillColor(255, 208, 0); doc.rect(0, 0, 210, 30, 'F');
+  doc.setTextColor(17, 17, 17); doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+  doc.text('PIANRAN - Rapport annuel ' + d.year, 14, 18);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.text('Établi le ' + new Date().toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'}) + ' · montants en FCFA', 14, 25);
+  doc.autoTable({...ra, startY: 38, theme: 'grid', headStyles: head, styles: {fontSize: 11, cellPadding: 3},
+    head: [['Synthèse ' + d.year, 'Montant']], columnStyles: {1: {halign: 'right', fontStyle: 'bold'}},
+    body: [['Revenus de l’année', n(d.tot.rev)], ['Dépenses prévues', n(d.tot.plan)], ['Dépenses payées', n(d.tot.paid)], ['Reste cumulé (revenus - prévu)', sg(d.tot.reste)], ['Mois suivis', String(d.rows.length)]]});
+  const right = {1: {halign: 'right'}, 2: {halign: 'right'}, 3: {halign: 'right'}, 4: {halign: 'right'}};
+  doc.autoTable({...ra, startY: doc.lastAutoTable.finalY + 8, theme: 'grid', headStyles: head, footStyles: foot, styles: {fontSize: 10}, columnStyles: right,
+    head: [['Mois', 'Revenus', 'Prévu', 'Payé', 'Reste']],
+    body: d.rows.map(r => [shortMonth(r.month).replace(/^./, c => c.toUpperCase()), n(r.rev), n(r.plan), n(r.paid), sg(r.reste)]),
+    foot: [['Total', n(d.tot.rev), n(d.tot.plan), n(d.tot.paid), sg(d.tot.reste)]]});
+  doc.autoTable({...ra, startY: doc.lastAutoTable.finalY + 8, theme: 'grid', headStyles: head, styles: {fontSize: 10}, columnStyles: right,
+    head: [['Catégorie', 'Prévu', 'Payé', 'Part']],
+    body: d.cats.map(([k, c]) => [k, n(c.plan), n(c.paid), (d.tot.plan ? Math.round(c.plan / d.tot.plan * 100) : 0) + ' %'])});
+  doc.autoTable({...ra, startY: doc.lastAutoTable.finalY + 8, theme: 'grid', headStyles: head, styles: {fontSize: 10}, columnStyles: right,
+    head: [['Source de revenu', 'Montant', 'Part']],
+    body: d.srcs.map(([k, v]) => [k, n(v), (d.tot.rev ? Math.round(v / d.tot.rev * 100) : 0) + ' %'])});
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(90); doc.text(`PIANRAN Budget · page ${i}/${pages}`, 105, 290, {align: 'center'}); }
+  return doc;
+}
+// Appels natifs (APK) via le pont Capacitor
+const isNative = () => typeof (window.Capacitor && window.Capacitor.nativePromise) === 'function';
+const native = (plugin, method, opts) => window.Capacitor.nativePromise(plugin, method, opts);
+async function deliver(mode){
+  const btn = mode === 'mail' ? $('#repMail') : $('#repSave'); btn.disabled = true;
+  try {
+    const doc = reportPDF(repData), name = `PIANRAN-rapport-${repData.year}.pdf`;
+    const subject = `Rapport budget ${repData.year} - PIANRAN`;
+    const text = `Rapport annuel ${repData.year} : revenus ${money(repData.tot.rev)}, dépenses prévues ${money(repData.tot.plan)}, reste ${signed(repData.tot.reste)}.`;
+    if (isNative()){
+      const data = doc.output('datauristring').split(',')[1];
+      if (mode === 'save'){
+        try {
+          const r = await native('Filesystem', 'writeFile', {path: name, data, directory: 'DOCUMENTS', recursive: true});
+          toast('Rapport enregistré dans Documents/' + name);
+          return;
+        } catch (e) { toast('Enregistrement direct impossible : choisissez où l’enregistrer'); }
+      }
+      const f = await native('Filesystem', 'writeFile', {path: name, data, directory: 'CACHE'});
+      await native('Share', 'share', {title: subject, text, files: [f.uri], dialogTitle: mode === 'mail' ? 'Envoyer le rapport' : 'Enregistrer le rapport'});
+      return;
+    }
+    const blob = doc.output('blob');
+    const file = new File([blob], name, {type: 'application/pdf'});
+    if (mode === 'mail' && navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: subject, text}); return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    if (mode === 'mail'){ setTimeout(() => location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text + '\n\nLe rapport PDF est joint (fichier ' + name + ' téléchargé).')}`, 600); }
+    toast('Rapport téléchargé');
+  } catch (e) {
+    if (!/cancel/i.test(String(e && (e.message || e)))) toast('Échec : ' + (e && e.message ? e.message : 'réessayez'));
+  } finally { btn.disabled = false; }
+}
+$('#repSave').onclick = () => deliver('save');
+$('#repMail').onclick = () => deliver('mail');
 
 document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
 document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
